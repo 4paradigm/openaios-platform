@@ -1,0 +1,21 @@
+{
+  "name": "cartpole",
+  "config": {
+    "image": {
+      "repo": "env/game/cartpole",
+      "tag": "latest",
+      "source": "public"
+    },
+    "mounts": [
+    ],
+    "compute_unit": "single-core",
+    "ssh": {
+      "enable": false,
+      "id_rsa.pub": ""
+    },
+    "jupyter": {
+      "enable": true,
+      "token": "ai4every1"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "pineapple.core.fullname" . }}
+  labels:
+    {{- include "pineapple.core.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: "default"
+  resources:
+    requests:
+      storage: "{{ .Values.webserverCeph.capacity.storage }}"
+  selector:
+    matchLabels:
+      {{- include "pineapple.core.selectorLabels" . | nindent 6 }}

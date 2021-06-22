@@ -1,0 +1,112 @@
+openapi: 3.0.3
+info:
+  title: webterminal api
+  description: webterminal api
+  version: 0.0.1
+
+servers:
+  - url: "http://127.0.0.1:1234/web-terminal"
+
+security:
+  - OpenID:
+      - openid
+      - email
+      - profile
+  - ApiKeyAuth: []
+
+tags:
+  - name: releases
+  - name: finished
+
+paths:
+  /terminal:
+    get:
+      parameters:
+        - in: query
+          name: pod
+          required: true
+          schema:
+            type: string
+          description: podName
+        - in: query
+          name: container
+          required: true
+          schema:
+            type: string
+          description: containerName
+      tags:
+        - releases
+        - finished
+      summary: Get web-terminal url
+      operationId: getTerminal
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebterminalInfo"
+        400:
+          description: Error
+        500:
+          $ref: "#/components/responses/ServerError"
+
+components:
+  schemas:
+    WebterminalInfo:
+      description: user login information
+      type: object
+      properties:
+        url:
+          type: string
+  responses:
+    ServerError:
+      description: server error
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: "Something went wrong."
+    RequestError:
+      description: http request error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              content:
+                type: object
+              message:
+                type: string
+              type:
+                type: string
+    500:
+      description: internal error
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: "internal error"
+    400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+              type:
+                type: string
+              content:
+                type: object
+            example:
+              message: this request is bad
+    401:
+      description: Unauthorized
+      content:
+        text/plain:
+          schema:
+            type: string

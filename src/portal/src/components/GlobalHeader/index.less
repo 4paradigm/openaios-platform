@@ -1,0 +1,42 @@
+.headerContanter {
+  background-color: #202a3c;
+}
+.header {
+  background-color: rgba(40, 45, 50, 0.8);
+  // background: url(../../assets/images/header.png) no-repeat center center;
+  // background-color: #fff;
+  color: white;
+  height: @header-height;
+  display: flex;
+  justify-content: space-between;
+  padding-left: 20px;
+  padding-right: 46px;
+  align-items: center;
+  border-bottom: 1px solid @color-border;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.title > * {
+  color: white;
+  &:hover {
+    color: white;
+  }
+}
+.logo {
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: top;
+  margin-top: 3px;
+}
+.dropdown {
+  :global {
+    .ant-btn span {
+      color: white;
+    }
+  }
+  margin-left: @gap-xsmall;
+}

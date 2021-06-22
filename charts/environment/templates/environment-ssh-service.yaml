@@ -1,0 +1,17 @@
+{{- if eq .Values.serverType.ssh "True" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "environment.fullname" . }}-ssh
+  labels:
+    {{- include "environment.labels" . | nindent 4 }}
+    role: ssh-service
+spec:
+  type: NodePort 
+  ports:
+  - port: 22
+    protocol: TCP
+    name: ssh
+  selector:
+    {{- include "environment.selectorLabels" . | nindent 4 }}
+{{- end }}

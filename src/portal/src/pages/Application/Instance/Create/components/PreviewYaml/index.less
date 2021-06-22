@@ -1,0 +1,58 @@
+.preview-yaml {
+  display: flex;
+  .preview-yaml-tree {
+    width: 320px;
+    height: 500px;
+    padding: 12px;
+    border: 1px solid @color-border;
+    margin-right: 16px;
+    border-radius: 4px;
+    overflow-y: auto;
+  }
+  .CodeMirror.cm-s-darcula {
+    height: 500px !important;
+  }
+  .CodeMirror-scroll {
+    padding-bottom: 60px;
+  }
+  .folder-icon {
+    width: 16px;
+    height: 16px;
+  }
+  .site-tree-search-value {
+    color: @color-error;
+  }
+  .cess-input-search {
+    margin-bottom: 8px;
+  }
+  .ant-tree-directory {
+    height: 430px;
+    overflow-y: auto;
+  }
+  .ant-tree-title {
+    overflow-x: visible;
+    white-space: nowrap;
+    padding-right: 8px;
+  }
+  .ant-tree-treenode:hover .ant-tree-node-selected,
+  .ant-tree-treenode .ant-tree-node-selected {
+    .ant-tree-title {
+      background-color: @color-primary;
+    }
+  }
+  .ant-tree-treenode:hover .ant-tree-title {
+    background-color: #f5f5f5;
+  }
+  .ant-tree.ant-tree-block-node .ant-tree-list-holder-inner .ant-tree-node-content-wrapper {
+    display: flex;
+  }
+  .ant-tree.ant-tree-directory .ant-tree-treenode::before {
+    transition: none;
+  }
+  .ant-tree-iconEle {
+    .iconfont {
+      font-size: 20px;
+      color: #efdf10;
+    }
+  }
+}

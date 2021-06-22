@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: remote-storage
+  labels:
+    app: cephfs
+    role: pvc
+    name: {{ .Release.Name }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: "ceph-storage"
+  resources:
+    requests:
+      storage: "{{ .Values.capacity.storage }}"
+  selector:
+    matchLabels:
+      app: cephfs

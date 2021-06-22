@@ -1,0 +1,352 @@
+openapi: 3.0.3
+info:
+  title: Pineapple-billing
+  description: Pineapple-billing
+  version: 0.0.2
+
+servers:
+  - url: "http://127.0.0.1:4321/api"
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /account:
+    get:
+      tags:
+        - account
+      summary: get account list
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AccountInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /account/{userid}:
+    parameters:
+      - in: path
+        name: userid
+        schema:
+          type: string
+        description: user id
+    post:
+      tags:
+        - account
+      summary: create user account
+      parameters:
+        - in: query
+          name: callback_url
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: balance
+          schema:
+            type: number
+            format: double
+          required: false
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    delete:
+      tags:
+        - account
+      summary: delete user account
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    put:
+      tags:
+        - account
+      summary: update user account info
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountInfo"
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /account/{userid}/balance:
+    parameters:
+      - in: path
+        name: userid
+        schema:
+          type: string
+        description: user id
+    get:
+      tags:
+        - account
+      summary: get user account balance
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: number
+                format: double
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags:
+        - account
+      summary: modify user account balance
+      parameters:
+        - in: query
+          name: buy_balance
+          schema:
+            type: number
+            format: double
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+
+  /computeunit/{userid}:
+    parameters:
+      - in: path
+        name: userid
+        schema:
+          type: string
+    get:
+      tags:
+        - computeunit
+      summary:
+        get computeunit list
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComputeunitInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags:
+        - computeunit
+      summary:
+        add computeunit group to user account
+      parameters:
+        - in: query
+          name: group_name
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    delete:
+      tags:
+        - computeunit
+      summary:
+        delete computeunit group of user account
+      parameters:
+        - in: query
+          name: group_name
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /computeunit/{userid}/computeunit_id/{computeunit_id}:
+    parameters:
+      - in: path
+        name: userid
+        schema:
+          type: string
+      - in: path
+        name: computeunit_id
+        schema:
+          type: string
+    get:
+      tags:
+        - computeunit
+      summary:
+        get single compueunit by userID and computeunitID
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComputeunitInfo"
+
+  /computeunit/group/{group_name}:
+    parameters:
+      - in: path
+        name: group_name
+        schema:
+          type: string
+    get:
+      tags:
+        - computeunit
+      summary:
+        get computeunit list in group
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComputeunitInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /computeunit/price:
+    get:
+      tags:
+        - computeunit
+      summary:
+        get computeunit price
+      parameters:
+        - in: query
+          name: computeunit_id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: number
+                format: double
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+
+  /instance:
+    post:
+      tags:
+        - instance
+      summary: create instance
+      parameters:
+        - in: query
+          name: instanceName
+          required: true
+          schema:
+            type: string
+            description: instance name
+        - in: query
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+  responses:
+    ServerError:
+      description: server error
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: "Something went wrong."
+    RequestError:
+      description: http request error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              content:
+                type: object
+              message:
+                type: string
+              type:
+                type: string
+  schemas:
+    AccountInfo:
+      type: object
+      properties:
+        userID:
+          type: string
+        balance:
+          type: number
+          format: double
+        callback_url:
+          type: string
+        computeunit_group:
+          type: array
+          items:
+            type: string
+    ComputeunitInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        price:
+          type: number
+          format: double
+        description:
+          type: string
+        spec:
+          type: object

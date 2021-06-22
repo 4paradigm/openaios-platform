@@ -1,0 +1,1793 @@
+openapi: 3.0.3
+info:
+  title: Pineapple
+  description: Pineapple
+  version: 0.0.1
+
+servers:
+  - url: "http://127.0.0.1:1234/api"
+
+security:
+  - OpenID:
+      - openid
+      - email
+      - profile
+  - ApiKeyAuth: []
+
+tags:
+  - name: images
+  - name: users
+  - name: environments
+  - name: releases
+  - name: applications
+  - name: appstore
+  - name: storage
+  - name: computing_resource
+  - name: logs
+  - name: competition
+  - name: finished
+
+
+paths:
+  /version:
+    get:
+      tags:
+        - finished
+      summary: image version
+      operationId: PineappleVersion
+      security: []
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+
+
+  /user/info:
+    get:
+      tags:
+        - users
+        - finished
+      summary: Get user info
+      operationId: getUser
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+        404:
+          description: User not found
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /user/tasks:
+    get:
+      tags:
+        - users
+        - finished
+      summary: get user task info
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserTasksInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /user/init:
+    post:
+      tags:
+        - users
+        - finished
+      summary: init user
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /computing_resource/specs:
+    get:
+      tags:
+        - computing_resource
+        - finished
+      summary: Get computing unit specifications
+      operationId: GetComputingUnitSpecs
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComputeUnitSpec"
+
+  /environments:
+    parameters:
+      - in: query
+        name: offset
+        schema:
+          type: integer
+        description: The number of items to skip before starting to collect the result set
+      - in: query
+        name: limit
+        schema:
+          type: integer
+        description: The numbers of items to return
+    get:
+      tags:
+        - environments
+        - finished
+      summary: Gets environment list
+      operationId: getEnvironmentList
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnvironmentRuntimeInfos"
+
+  /environments/{name}:
+    parameters:
+      - in: path
+        name: name
+        schema:
+          $ref: "#/components/schemas/EnvironmentName"
+        required: true
+        description: "Name of environment"
+
+    get:
+      tags:
+        - environments
+        - finished
+      summary: Gets environment
+      operationId: getEnvironment
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnvironmentRuntimeInfo"
+        400:
+          description: Error
+        500:
+          $ref: "#/components/responses/ServerError"
+
+    post:
+      tags:
+        - environments
+        - finished
+      summary: Create an environment
+      operationId: createEnvironment
+      requestBody:
+        description: Information about creating an environment
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnvironmentConfig"
+      responses:
+        200:
+          description: OK
+        400:
+          description: Error
+        500:
+          $ref: "#/components/responses/ServerError"
+
+    delete:
+      tags:
+        - environments
+        - finished
+      summary: Delete an environment
+      operationId: deleteEnvironment
+      responses:
+        200:
+          description: OK
+        400:
+          description: Error
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /applications:
+    get:
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: The numbers of items to return
+      tags:
+        - applications
+        - finished
+      summary: Get application list
+      operationId: getApplicationList
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationList"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /applications/{name}:
+    parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+        required: true
+        description: application name
+    post:
+      tags:
+        - applications
+        - finished
+      summary: Create an app
+      operationId: createApplication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationConfig"
+      responses:
+        200:
+          description: OK
+        400:
+          description: Error
+        500:
+          $ref: "#/components/responses/ServerError"
+    delete:
+      tags:
+        - applications
+        - finished
+      summary: Delete an application instance
+      operationId: deleteApplication
+      responses:
+        200:
+          description: OK
+        400:
+          description: Error
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /applications/{name}/metadata:
+    parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+        required: true
+        description: application name
+    get:
+      tags:
+        - applications
+        - finished
+      summary: Gets a application metadata
+      operationId: getApplicationMetadata
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationInstanceMetadata"
+        400:
+          description: Error
+        500:
+          $ref: "#/components/responses/ServerError"
+  /applications/{name}/pods:
+    parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+        required: true
+        description: application name
+    get:
+      tags:
+        - applications
+        - finished
+      summary: Gets a application pods
+      operationId: getApplicationPods
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationInstancePodList"
+        400:
+          description: Error
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /applications/{name}/services:
+    parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+        required: true
+        description: application name
+    get:
+      tags:
+        - applications
+        - finished
+      summary: Gets a application services
+      operationId: getApplicationServices
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationInstanceServiceList"
+        400:
+          description: Error
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /applications/{name}/notes:
+    parameters:
+      - in: path
+        name: name
+        schema:
+          type: string
+        required: true
+        description: application name
+    get:
+      tags:
+        - applications
+        - finished
+      summary: Gets application notes
+      operationId: getApplicationNotes
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notes:
+                    type: string
+        400:
+          description: Error
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /appstore/charts:
+    get:
+      tags:
+        - appstore
+        - finished
+      summary: Get chart list
+      operationId: getAppstoreChartList
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChartMetaDataList"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /appstore/charts/{category}:
+    parameters:
+      - in: path
+        name: category
+        schema:
+          $ref: "#/components/schemas/ChartCategory"
+        required: true
+        description: chart repo
+    post:
+      tags:
+        - appstore
+      summary: Upload chart
+      operationId: uploadChart
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  $ref: "#/components/schemas/FileType"
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+
+  /appstore/charts/{category}/{name}/{version}:
+    parameters:
+      - in: path
+        name: category
+        schema:
+          $ref: "#/components/schemas/ChartCategory"
+        required: true
+        description: chart repo
+      - in: path
+        name: name
+        schema:
+          type: string
+        required: true
+        description: chart name
+      - in: path
+        name: version
+        schema:
+          type: string
+        required: true
+        description: chart version
+    get:
+      tags:
+        - appstore
+        - finished
+      summary: Get a chart
+      operationId: getAppstoreChart
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chart"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+
+  /releases/{name}:
+    parameters:
+      - in: path
+        name: name
+        schema:
+          $ref: "#/components/schemas/ReleaseName"
+        required: true
+        description: release name
+
+    get:
+      tags:
+        - releases
+      summary: Get information from specific release
+      operationId: getRelease
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    $ref: "#/components/schemas/ReleaseName"
+                  summary:
+                    $ref: "#/components/schemas/ShortDescription"
+                  description:
+                    $ref: "#/components/schemas/LongDescription"
+                  pods:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/KubernetesPod"
+                  services:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/KubernetesService"
+        404:
+          description: Release not found
+        500:
+          $ref: "#/components/responses/ServerError"
+
+    post:
+      tags:
+        - releases
+      summary: Create a release
+      operationId: createRelease
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReleaseCreateConfig"
+      responses:
+        200:
+          description: OK
+        409:
+          description: Duplicated environment name
+        500:
+          $ref: "#/components/responses/ServerError"
+
+    delete:
+      tags:
+        - releases
+      summary: Delete a release
+      operationId: deleteRelease
+      responses:
+        200:
+          description: OK
+        404:
+          description: Release not found
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /log/pod/{pod_name}:
+    get:
+      tags:
+        - logs
+        - finished
+      summary: get container log
+      operationId: GetContainerLog
+      parameters:
+        - in: path
+          name: pod_name
+          schema:
+            $ref: "#/components/schemas/PodName"
+          required: true
+          description: pod name in kubernetes
+        - in: query
+          name: container_name
+          schema:
+            $ref: "#/components/schemas/ContainerName"
+          required: false
+          description: container name in kubernetes
+        - in: query
+          name: tail_lines
+          schema:
+            type: integer
+            format: int64
+          required: false
+          description: tail lines of the log
+      responses:
+        200:
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /images/importing:
+    get:
+      tags:
+        - images
+        - finished
+      summary:
+        List importing images
+      operationId: ListImportingImages
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ImageImportingInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    post:
+      tags:
+        - images
+        - finished
+      summary:
+        Import images
+      parameters:
+        - in: query
+          name: registryId
+          schema:
+            type: integer
+            format: int64
+          required: true
+          description: image registry id
+        - in: query
+          name: repo
+          schema:
+            $ref: "#/components/schemas/ImageRepo"
+          required: true
+        - in: query
+          name: tag
+          schema:
+            $ref: "#/components/schemas/ImageTag"
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    delete:
+      tags:
+        - images
+        - finished
+      summary: 
+        Remove importing from list
+      parameters:
+        - in: query
+          name: importing_id
+          schema:
+            $ref: "#/components/schemas/ImageImportingId"
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    put:
+      tags:
+        - images
+        - finished
+      summary:
+        Stop importing
+      parameters:
+        - in: query
+          name: importing_id
+          schema:
+            $ref: "#/components/schemas/ImageImportingId"
+          required: true
+          description: importing id to stop
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /images/registry:
+    get:
+      tags:
+        - images
+        - finished
+      summary:
+        Get registry list
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ImageRegistryInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /public_images/info:
+    get:
+      tags:
+        - images
+        - finished
+      summary:
+        Get public project info
+      parameters:
+        - in: query
+          name: filter
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectUserInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /public_images:
+    get:
+      tags:
+        - images
+        - finished
+      summary:
+        Get public images
+      parameters:
+        - in: query
+          name: filter
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: page_size
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ImageInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /images/info:
+    get:
+      tags:
+        - images
+        - finished
+      summary:
+        Get user project info
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectUserInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /images:
+    get:
+      tags:
+        - images
+        - finished
+      summary:
+        Get images
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: page_size
+          schema:
+            type: integer
+            format: int64
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ImageInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    put:
+      tags:
+        - images
+        - finished
+      summary:
+        Copy image
+      parameters:
+        - in: query
+          name: src_repo
+          schema:
+            $ref: "#/components/schemas/ImageRepo"
+          required: true
+        - in: query
+          name: dest_repo
+          schema:
+            $ref: "#/components/schemas/ImageRepo"
+          required: true
+        - in: query
+          name: tag
+          schema:
+            $ref: "#/components/schemas/ImageTag"
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    delete:
+      tags:
+        - images
+        - finished
+      summary:
+        Delete image
+      parameters:
+        - in: query
+          name: repo
+          schema:
+            $ref: "#/components/schemas/ImageRepo"
+          required: true
+        - in: query
+          name: tag
+          schema:
+            $ref: "#/components/schemas/ImageTag"
+          required: true
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+
+  /competition:
+    get:
+      tags:
+        - competition
+        - finished
+      summary: list competition
+      parameters:
+        - in: query
+          name: beginning
+          schema:
+            type: string
+            format: date-time
+          required: false
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: date-time
+          required: false
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CompetitionInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /competition/{competitionID}:
+    parameters:
+      - in: path
+        name: competitionID
+        schema:
+          type: string
+        description: computition id
+    post:
+      tags:
+        - competition
+        - finished
+      summary: join competition
+      parameters:
+        - in: query
+          name: inviter
+          schema:
+            type: string
+          description: inviter id
+          required: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+    get:
+      tags:
+        - competition
+        - finished
+      summary: check joined competition
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: boolean
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /competition/{competitionID}/invitation:
+    parameters:
+      - in: path
+        name: competitionID
+        schema:
+          type: string
+        description: computition id
+    get:
+      tags:
+        - competition
+        - finished
+      summary: get invitation number in a competition
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: integer
+                format: int64
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+
+  /storage:
+    get:
+      tags:
+        - storage
+        - finished
+      summary: Get directory
+      operationId: getDirectory
+      parameters:
+        - in: query
+          name: path
+          schema:
+            $ref: "#/components/schemas/PosixPath"
+          required: false
+          description: Directory path
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FileInfo"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+    post:
+      tags:
+        - storage
+        - finished
+      summary: Create directory
+      operationId: createDirectory
+      parameters:
+        - in: query
+          name: path
+          schema:
+            $ref: "#/components/schemas/PosixPath"
+          required: true
+          description: File or Directory path
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+    delete:
+      tags:
+        - storage
+        - finished
+      summary: Delete directory or file
+      operationId: deleteDirectoryOrFile
+      parameters:
+        - in: query
+          name: path
+          schema:
+            $ref: "#/components/schemas/PosixPath"
+          required: True
+          description: Directory path
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /storage/upload:
+    post:
+      tags:
+        - storage
+        - finished
+      summary: Upload File
+      parameters:
+        - in: query
+          name: path
+          schema:
+            $ref: "#/components/schemas/PosixPath"
+          required: false
+          description: Destination directory
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  $ref: "#/components/schemas/FileType"
+      responses:
+        200:
+          description: OK
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+  /storage/download:
+    parameters:
+      - in: query
+        name: path
+        schema:
+          $ref: "#/components/schemas/PosixPath"
+        required: true
+        description: Source path
+    get:
+      tags:
+        - storage
+        - finished
+      summary: Download File
+      responses:
+        200:
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                $ref: "#/components/schemas/FileType"
+        400:
+          $ref: "#/components/responses/RequestError"
+        500:
+          $ref: "#/components/responses/ServerError"
+
+
+components:
+  securitySchemes:
+#    BasicAuth:
+#      type: http
+#      scheme: basic
+    OpenID:
+      type: openIdConnect
+      openIdConnectUrl: /.well-known/openid-configuration
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+  responses:
+    ServerError:
+      description: server error
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: "Something went wrong."
+    RequestError:
+      description: http request error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              content:
+                type: object
+              message:
+                type: string
+              type:
+                type: string
+    500:
+      description: internal error
+      content:
+        text/plain:
+          schema:
+            type: string
+          example: "internal error"
+    400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - message
+            properties:
+              message:
+                type: string
+              type:
+                type: string
+              content:
+                type: object
+            example:
+              message: this request is bad
+    401:
+      description: Unauthorized
+      content:
+        text/plain:
+          schema:
+            type: string
+  schemas:
+    PosixPath:
+      description: posix path for directory or file
+      type: string
+      maxLength: 256
+    UserName:
+      description: user name
+      type: string
+      pattern: '^[\d\w\.-]*$'
+      maxLength: 32
+      example: coolguy
+    Password:
+      description: password
+      type: string
+      pattern: '^[\d\w\.-]*$'
+      maxLength: 32
+      example: strongpassword
+    Email:
+      description: user email
+      type: string
+      example: coolguy@coolcompany.com
+    EnvironmentName:
+      description: environment name
+      type: string
+      pattern: '^[\d\w\.-]*$'
+      maxLength: 32
+    ChartName:
+      description: chart name
+      type: string
+      pattern: '^[\d\w\.-]*$'
+      maxLength: 32
+    ReleaseName:
+      description: release name
+      type: string
+      pattern: '^[\d\w\.-]*$'
+      maxLength: 32
+    ImageName:
+      description: image name
+      type: string
+      pattern: '^[\d\w\.-]*$'
+      maxLength: 64
+    ServiceName:
+      description: service name
+      type: string
+      pattern: '^[\d\w\.-]*$'
+      maxLength: 32
+    PodName:
+      description: pod name
+      type: string
+      pattern: '^[\d\w\.-]*$'
+      maxLength: 32
+    ContainerName:
+      description: container name
+      type: string
+      pattern: '^[\d\w\.-]*$'
+      maxLength: 32
+    ChartVersion:
+      description: chart version
+      type: string
+      pattern: '^[\d\.]*$'
+    Port:
+      description: port
+      type: integer
+      minimum: 0
+      maximum: 65353
+    ReleaseState:
+      type: string
+      enum:
+        - "running"
+        - "stopped"
+        - "finished"
+    PodState:
+      type: string
+    ContainerState:
+      type: string
+    UserInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John
+        balance:
+          type: number
+          format: double
+#        create_tm:
+#          type: string
+#          format: date-time
+#          example: 2017-07-21T17:32:28Z
+#        instance_num:
+#          type: integer
+#          format: int32
+#          example: 2
+    EmailVerifyCode:
+      type: string
+    UserLoginInfo:
+      description: user login information
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          $ref: "#/components/schemas/UserName"
+        password:
+          $ref: "#/components/schemas/Password"
+    UserRegisterInfo:
+      description: user register information
+      type: object
+      required:
+        - code
+        - email
+        - username
+        - password
+      properties:
+        code:
+          $ref: "#/components/schemas/EmailVerifyCode"
+        email:
+          $ref: "#/components/schemas/Email"
+        username:
+          $ref: "#/components/schemas/UserName"
+        password:
+          $ref: "#/components/schemas/Password"
+    UserRefreshToken:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+    UserTasksInfo:
+      type: object
+      properties:
+        env_num:
+          type: integer
+          format: int64
+        app_num:
+          type: integer
+          format: int64
+        task_list:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserTaskInfo"
+    UserTaskInfo:
+      type: object
+      properties:
+        compute_unit:
+          $ref: "#/components/schemas/ComputeUnitId"
+        number:
+          type: integer
+          format: int64
+        price:
+          type: number
+          format: double
+    StorageMapping:
+      description: storage mapping
+      type: object
+      properties:
+        subpath:
+          type: string
+          description: relative path to user storage path
+          example: "the/path/inside/user/storage/path"
+        mountpath:
+          type: string
+          description: absolute path to container filesystem path
+          example: "/the/path/inside/container"
+    ServiceExpose:
+      description: service to expose
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/ServiceName"
+        port:
+          $ref: "#/components/schemas/Port"
+    ImageConfig:
+      description: image configuration
+      type: object
+      properties:
+        repo:
+          type: string
+        tag:
+          example: 20.12-tf2-py3
+          type: string
+        source:
+          example: private
+          type: string
+    EnvironmentConfig:
+      description: environment configuration
+      type: object
+      properties:
+        image:
+          $ref: "#/components/schemas/ImageConfig"
+        mounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/StorageMapping"
+        compute_unit:
+          $ref: "#/components/schemas/ComputeUnitId"
+        ssh:
+          type: object
+          properties:
+            enable:
+              example: true
+              type: boolean
+            id_rsa.pub:
+              example: ssh-rsa XXXX
+              type: string
+        jupyter:
+          type: object
+          properties:
+            enable:
+              example: true
+              type: boolean
+            token:
+              example: abcdefg
+              type: string
+    EnvironmentState:
+      description: environment state
+      type: string
+      enum:
+        - "Pending"
+        - "Running"
+        - "Succeeded"
+        - "Failed"
+        - "Unknown"
+    EnvironmentRuntimeStaticInfo:
+      description: environment runtime static information
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/EnvironmentName"
+        create_tm:
+          type: string
+          format: date-time
+          example: 2017-07-21T17:32:28Z
+        environmentConfig:
+          $ref: "#/components/schemas/EnvironmentConfig"
+        notebook_url:
+          type: string
+        description:
+          type: string
+    EnvironmentRuntimeSshInfo:
+      description: environment runtime ssh information
+      type: object
+      properties:
+        ssh_ip:
+          type: string
+          format: ipv4
+        ssh_port:
+          type: string
+    EnvironmentRuntimeInfo:
+      description: environment runtime information
+      type: object
+      properties:
+        staticInfo:
+          $ref: "#/components/schemas/EnvironmentRuntimeStaticInfo"
+        state:
+          $ref: "#/components/schemas/EnvironmentState"
+        sshInfo:
+          $ref: "#/components/schemas/EnvironmentRuntimeSshInfo"
+        pod_name:
+          type: string
+    EnvironmentRuntimeInfos:
+      description: environment runtime information list
+      type: object
+      properties:
+        total:
+          type: integer
+        item:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnvironmentRuntimeInfo"
+    ApplicationConfig:
+      description: metadata to create an application instance
+      type: object
+      properties:
+        url:
+          type: string
+        answers:
+          type: object
+    ReleaseCreateConfig:
+      description: metadata to create a release
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/ReleaseName"
+        chart_name:
+          $ref: "#/components/schemas/ChartName"
+        value_encode:
+          description: utf-8 encoded value.yaml file
+          type: string
+          format: binary
+    KubernetesContainer:
+      description: container schema
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/ContainerName"
+        state:
+          $ref: "#/components/schemas/ContainerState"
+        image:
+          $ref: "#/components/schemas/ImageName"
+    KubernetesPod:
+      description: pod schema
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/PodName"
+        ip:
+          type: string
+          format: ipv4
+        state:
+          $ref: "#/components/schemas/PodState"
+        compute_unit:
+          $ref: "#/components/schemas/ComputeUnitId"
+        containers:
+          type: array
+          items:
+            $ref: "#/components/schemas/KubernetesContainer"
+    KubernetesService:
+      description: service schema
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/ServiceName"
+        cluster_ip:
+          type: string
+          format: ipv4
+        port:
+          type: string
+          format: port
+        node_port:
+          type: string
+          format: port
+    ChartValue:
+      type: string
+    ChartCategory:
+      description: chart repo category
+      type: string
+      enum:
+        - public-official
+        - public-practical
+        - public-community
+        - private
+    ChartMetaDataList:
+      description: chart metadata list
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChartMetadata"
+    Chart:
+      description: chart
+      type: object
+      properties:
+        metadata:
+          $ref: "#/components/schemas/ChartMetadata"
+        files:
+          $ref: "#/components/schemas/ChartFiles"
+        version_list:
+          type: array
+          items:
+            type: string
+    ChartMetadata:
+      description: chart metadata
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        version:
+          type: string
+        url:
+          type: string
+        icon_link:
+          type: string
+        category:
+          $ref: "#/components/schemas/ChartCategory"
+    ChartFiles:
+      description: chart files
+      type: object
+      additionalProperties:
+        type: string
+        format: byte
+    ApplicationList:
+      description: application instance list
+      type: object
+      properties:
+        total:
+          type: integer
+        item:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplicationInstanceMetadata"
+    ApplicationInstanceMetadata:
+      description: application instance
+      type: object
+      properties:
+        instance_name:
+          type: string
+        chart_name:
+          type: string
+        chart_version:
+          type: string
+        create_tm:
+          type: string
+          format: date-time
+          example: 2017-07-21T17:32:28Z
+        status:
+          type: string
+    ApplicationInstancePodList:
+      description: application instance pod list
+      type: object
+      properties:
+        total:
+          type: integer
+        item:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplicationInstancePod"
+    ApplicationInstancePod:
+      description: application instance pod
+      type: object
+      properties:
+        name:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplicationInstanceEvent"
+        state:
+          type: string
+        containers:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplicationInstanceContainer"
+        create_tm:
+          type: string
+          format: date-time
+          example: 2017-07-21T17:32:28Z
+    ApplicationInstanceEvent:
+      description: application instance event
+      type: object
+      properties:
+        type:
+          type: string
+        reason:
+          type: string
+        age:
+          type: string
+        from:
+          type: string
+        message:
+          type: string
+    ApplicationInstanceContainer:
+      description: application instance container
+      type: object
+      properties:
+        name:
+          type: string
+        image:
+          type: string
+        state:
+          type: string
+        ports:
+          type: array
+          items:
+            type: object
+            properties:
+              container_port:
+                type: string
+              protocol:
+                type: string
+    ApplicationInstanceServiceList:
+      description: application instance service list
+      type: object
+      properties:
+        total:
+          type: integer
+        item:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplicationInstanceService"
+    ApplicationInstanceService:
+      description: application instance pod
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        cluster_ip:
+          type: string
+        external_ips:
+          type: array
+          items:
+            type: string
+        ports:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              port:
+                type: string
+              node_port:
+                type: string
+              protocol:
+                type: string
+    LongDescription:
+      description: long description including newlines
+      type: string
+    ShortDescription:
+      description: short description excluding newlines
+      type: string
+    ImageRegistryInfo:
+      description: image registry info
+      type: object
+      properties:
+        url:
+          type: string
+        id:
+          type: integer
+          format: int64
+    ImageRepo:
+      description: image repo
+      type: string
+    ImageTag:
+      description: image tag
+      type: string
+    ImageImportingId:
+      description: image importing ID
+      type: integer
+      format: int64
+    ImageImportingInfo:
+      description: import image info
+      type: object
+      properties:
+        registry:
+          $ref: "#/components/schemas/ImageRegistryInfo"
+        repo:
+          $ref: "#/components/schemas/ImageRepo"
+        tag:
+          $ref: "#/components/schemas/ImageTag"
+        status:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        importing_id:
+          $ref: "#/components/schemas/ImageImportingId"
+    ImageInfo:
+      description: image info
+      type: object
+      properties:
+        repo:
+          $ref: "#/components/schemas/ImageRepo"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImageTag"
+        size:
+          type: string
+        importing_time:
+          type: string
+          format: date-time
+    ProjectUserInfo:
+      description: user repo info
+      type: object
+      properties:
+        image_count:
+          type: integer
+          format: int64
+    MemorySpec:
+      description: memory spec
+      type: string
+      pattern: '^[\d]+(G|M|K)$'
+    ComputeUnitId:
+      description: compute unit name
+      type: string
+      example: 1c-1g
+      maxLength: 32
+    ComputeUnitSpec:
+      description: compute unit spec
+      type: object
+      properties:
+        name:
+          type: string
+          description: compute unit spec
+          example: Free CPU
+        id:
+          $ref: "#/components/schemas/ComputeUnitId"
+        price:
+          type: number
+          format: double
+          description: price
+          example: 15.0
+        description:
+          type: string
+    DomainType:
+      description: private or public
+      type: string
+      enum:
+        - public
+        - private
+    FileInfo:
+      description: file or directory info
+      type: object
+      properties:
+        name:
+          type: string
+        is_dir:
+          type: boolean
+        size:
+          type: string
+        modification_time:
+          type: string
+          format: date-time
+    FileType:
+      description: file type for upload and Download
+      type: string
+      format: binary
+    CompetitionInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: string
+        beginning:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+        avl:
+          type: boolean
+        computingResource:
+          type: array
+          items:
+            $ref: "#/components/schemas/ComputeUnitSpec"

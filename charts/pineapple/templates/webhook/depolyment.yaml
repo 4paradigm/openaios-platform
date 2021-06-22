@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pineapple.webhook.fullname" . }}
+  labels:
+    {{- include "pineapple.webhook.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "pineapple.webhook.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "pineapple.webhook.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: webhook
+          image: "{{ .Values.webhook.image.repository }}:{{ .Values.webhook.image.tag }}"
+          imagePullPolicy: {{ .Values.webhook.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.webhook.resources | nindent 12 }}
+          command:
+            - "/root/webhook"
+          env:
+            - name: PINEAPPLE_BILLING_SERVER_URL
+              value: http://{{ include "pineapple.billing.fullname" . }}/api
+          ports:
+            - containerPort: {{ .Values.webhook.port.containerPort }}
+              name: webhook-api
+          volumeMounts:
+            - name: webhook-tls-certs
+              mountPath: /run/secrets/tls
+              readOnly: true
+      volumes:
+        - name: webhook-tls-certs
+          secret:
+            secretName: pineapple-webhook-tls

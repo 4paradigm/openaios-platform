@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pineapple.webhook.fullname" . }}
+spec:
+  selector:
+    {{- include "pineapple.webhook.selectorLabels" . | nindent 4 }}
+  ports:
+    - port: {{ .Values.webhook.port.servicePort }}
+      targetPort: webhook-api

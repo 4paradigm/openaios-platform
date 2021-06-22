@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pineapple.core.fullname" . }}
+  labels:
+    {{- include "pineapple.core.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.expose.service.type }}
+  ports:
+    - port: {{ .Values.expose.service.port }}
+      targetPort: 80
+      name: http
+  selector:
+    {{- include "pineapple.core.selectorLabels" . | nindent 4 }}

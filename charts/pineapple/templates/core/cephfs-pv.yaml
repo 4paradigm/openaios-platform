@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "pineapple.core.fullname" . }}-{{ .Release.Namespace }}
+  labels:
+    {{- include "pineapple.core.labels" . | nindent 4 }}
+spec:
+  storageClassName: "default"
+  claimRef:
+    name: {{ include "pineapple.core.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+  capacity:
+    storage: "{{ .Values.webserverCeph.capacity.storage }}"
+  accessModes:
+    - ReadWriteMany
+  cephfs:
+    {{- toYaml .Values.webserverCeph.cephfs | nindent 4 }}
+    secretRef:
+      name: {{ include "pineapple.core.fullname" . }}-cephfs

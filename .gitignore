@@ -1,0 +1,28 @@
+*~
+.idea
+.DS_Store
+**/apigen
+build
+
+
+# dependencies
+/node_modules
+/npm-debug.log*
+/yarn-error.log
+
+# production
+/dist
+
+# misc
+.DS_Store
+
+# umi
+.umi
+.umi-production
+
+# portal
+/src/portal/node_modules/
+/src/portal/dist/
+.npmrc
+package.json
+package-lock.json

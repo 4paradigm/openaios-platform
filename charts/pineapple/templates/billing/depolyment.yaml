@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pineapple.billing.fullname" . }}
+  labels:
+    {{- include "pineapple.billing.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "pineapple.billing.selectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.billing.replicaCount }}
+  template:
+    metadata:
+      labels:
+        {{- include "pineapple.billing.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "pineapple.billing.fullname" . }}
+      containers:
+      - name: billing
+        image: "{{ .Values.billing.image.repository }}:{{ .Values.billing.image.tag }}"
+        imagePullPolicy: {{ .Values.billing.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.billing.resources | nindent 12 }}
+        command:
+          - "/root/billing"
+        env:
+          - name: PINEAPPLE_MONGODB_URL
+            value: {{ .Values.billing.mongodb.url }}
+          - name: PINEAPPLE_MONGODB_DATABASE
+            value: {{ .Values.billing.mongodb.dbName }}
+          {{- range $k, $v := .Values.billing.extraEnv }}
+          - name: {{ $k }}
+            value: {{ quote $v }}
+          {{- end }}
+        volumeMounts:
+          - mountPath: /etc/ssl/certs/pineapple.crt
+            subPath: ca.crt
+            readOnly: false
+            name: crt-secret-volume
+      volumes:
+        - secret:
+            secretName: {{ .Values.rootCA }}
+          name: crt-secret-volume
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

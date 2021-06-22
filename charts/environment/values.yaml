@@ -1,0 +1,38 @@
+pineapple:
+  belongTo: user
+  default:
+    resourceId: ""
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: Always
+
+serverType:
+  jupyter: "True"
+  ssh: "False"
+
+ssh:
+  sshKey: ""
+
+jupyter:
+  token: ""
+
+pvc:
+  claimName: ""
+
+volumeMounts:
+  - mountPath: ""
+    subPath: ""
+    name: user-storage
+  - mountPath: ""
+    subPath: ""
+    name: user-storage
+
+ingress:
+  host: ""
+  enableTLS: false
+
+appConf:
+  ingressClass: ""
+

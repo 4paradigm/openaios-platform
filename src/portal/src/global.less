@@ -1,0 +1,46 @@
+html,
+body,
+#root {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  // font-family: PingFang SC, Helvetica Neue, Helvetica, Arial, Hiragino Sans GB, Microsoft YaHei,
+  //   WenQuanYi Micro Hei, sans-serif;
+}
+
+*,
+::before,
+::after {
+  box-sizing: inherit;
+}
+
+.comm-page-layout {
+  padding: 20px 16px;
+}
+#root {
+  .ant-btn.ant-btn-primary:hover {
+    color: #fff;
+    background-color: rgba(@color-primary, 0.9);
+    border-color: rgba(@color-primary, 0.9);
+  }
+  .ant-btn.ant-btn-default:hover {
+    opacity: 0.9;
+    border-color: @color-primary;
+    color: @color-primary;
+    background-color: #ffffff;
+  }
+}
+.ant-btn.ant-btn-default:focus {
+  color: #333;
+  background: #fff;
+  border-color: #ebebeb;
+}
+.ant-btn.ant-btn-primary:focus {
+  color: #fff;
+  opacity: 1;
+  background: @color-primary;
+  border-color: @color-primary;
+}

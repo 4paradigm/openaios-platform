@@ -1,0 +1,12 @@
+userId: ""
+
+cephfs:
+  monitors: []
+  path: ""
+  user: ""
+
+capacity:
+  storage: 10Gi
+
+cephSecret:
+  key: ""

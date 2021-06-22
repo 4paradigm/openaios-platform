@@ -1,0 +1,79 @@
+.application-instance-detail-pods {
+  .ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
+    right: 20px;
+    top: 28px;
+    svg {
+      float: right;
+      color: @color-primary;
+      font-weight: 500;
+      font-size: 16px;
+    }
+  }
+  .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+    padding-left: 16px;
+    background-color: rgba(@color-primary, 0.05);
+  }
+  .pods-group-header {
+    position: relative;
+    .pods-group-title {
+      height: 16px;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .pods-group-ctime {
+      margin-top: 10px;
+    }
+    .ant-btn {
+      position: absolute;
+      right: 24px;
+      top: 8px;
+    }
+  }
+
+  .pods-container {
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .pods-container-item {
+    display: flex;
+    width: 100%;
+    border-top: 1px solid @color-border;
+    padding-top: 16px;
+    margin-bottom: 24px;
+    .container-item-icon {
+      width: 50px;
+      height: 50px;
+      border: 1px solid @color-border;
+      padding: 3px;
+      margin-right: 16px;
+    }
+    .container-item-name {
+      width: 24%;
+    }
+    .container-item-state {
+      width: 80px;
+      margin-left: 16px;
+    }
+    .container-item-pords {
+      flex: 1;
+    }
+    .container-item-terminal {
+      width: 160px;
+      margin-left: 16px;
+    }
+    .container-item-log {
+      margin-top: 8px;
+    }
+    .column {
+      line-height: 24px;
+    }
+  }
+  .memo {
+    color: @color-secondary;
+  }
+  .empty-container {
+    position: relative;
+    width: 100%;
+    height: 240px;
+  }
+}

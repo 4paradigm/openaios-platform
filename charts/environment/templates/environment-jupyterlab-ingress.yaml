@@ -1,0 +1,25 @@
+{{- if eq .Values.serverType.jupyter "True" }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "environment.fullname" . }}-jupyterlab
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.appConf.ingressClass }}
+spec:
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - path: "/ingress/{{ .Release.Namespace }}/env/{{ .Release.Name }}/jupyterlab"
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "environment.fullname" . }}-jupyterlab
+                port:
+                  number: 8888
+  {{- if .Values.ingress.enableTLS }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+  {{- end }}
+{{- end }}

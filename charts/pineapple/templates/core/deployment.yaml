@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pineapple.core.fullname" . }}
+  labels:
+    {{- include "pineapple.core.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "pineapple.core.selectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.core.replicaCount }}
+  template:
+    metadata:
+      labels:
+        {{- include "pineapple.core.labels" . | nindent 8 }}
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '80'
+        prometheus.io/path: 'metrics'
+    spec:
+      serviceAccountName: {{ include "pineapple.core.fullname" . }}
+      containers:
+      - name: {{ include "pineapple.core.fullname" . }}
+        image: "{{ .Values.core.image.repository }}:{{ .Values.core.image.tag }}"
+        imagePullPolicy: {{ .Values.core.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.core.resources | nindent 10 }}
+        command:
+          - "/root/pineapple"
+        env:
+          - name: PINEAPPLE_VERSION
+            value: {{ .Values.version }}
+          - name: PINEAPPLE_OIDC_CLIENT_ID
+            value: {{ .Values.keycloak.clientID }}
+          - name: PINEAPPLE_OIDC_KEYCLOAK_URL
+            value: {{ .Values.keycloak.url }}
+          - name: PINEAPPLE_EXTERNAL_URL
+            value: {{ .Values.expose.externalIngress.url }}
+          - name: PINEAPPLE_EXTERNAL_HOST
+            value: {{ .Values.expose.externalIngress.host }}
+          - name: PINEAPPLE_EXTERNAL_TLS
+            value: {{ .Values.expose.externalIngress.tls.enable | quote }}
+          - name: PINEAPPLE_INTERNAL_URL
+            value: "http://{{ include "pineapple.core.fullname" . }}"
+          - name: PINEAPPLE_STORAGE_ROOT
+            value: /root/storage
+          - name: PINEAPPLE_PVC_CEPH_SECRET
+            value: {{ .Values.userCeph.cephSecret.key }}
+          - name: PINEAPPLE_BILLING_SERVER_URL
+            value: http://{{ include "pineapple.billing.fullname" . }}/api
+          - name: PINEAPPLE_HARBOR_URL
+            value: {{ .Values.harbor.url }}
+          - name: PINEAPPLE_HARBOR_BASEPATH
+            value: {{ .Values.harbor.basepath }}
+          - name: PINEAPPLE_HARBORV1_BASEPATH
+            value: {{ .Values.harbor.basepathV1 }}
+          - name: PINEAPPLE_HARBOR_STORAGE_LIMIT
+            value: "50000000000" # 50GB
+          - name: PINEAPPLE_HARBOR_ADMIN_USERNAME
+            value: {{ .Values.harbor.admin_username }}
+          - name: PINEAPPLE_HARBOR_ADMIN_PASSWORD
+            value: {{ .Values.harbor.admin_password }}
+          - name: PINEAPPLE_ENV_SSHURL
+            value: {{ .Values.expose.externalUsersDomain }}
+          {{- range $k, $v := .Values.core.extraEnv }}
+          - name: {{ $k }}
+            value: {{ quote $v }}
+          {{- end }}
+        # TODO: move these volume mounts to standard directory
+        volumeMounts:
+        - mountPath: /root/storage
+          name: pineapple-storage
+        - mountPath: /etc/ssl/certs/pineapple-ca.crt
+          subPath: ca.crt
+          readOnly: false
+          name: crt-secret-volume
+        - mountPath: /root/config
+          name: common-config-volume
+      volumes:
+      - persistentVolumeClaim:
+          claimName: {{ include "pineapple.core.fullname" . }}
+        name: pineapple-storage
+      - secret:
+          secretName: {{ .Values.rootCA }}
+        name: crt-secret-volume
+      - configMap:
+          name: {{ include "pineapple.core.fullname" . }}
+          items:
+            - key: cephfs-info.yaml
+              path: cephfs-info.yaml
+            - key: appConf.yaml
+              path: appConf.yaml
+        name: common-config-volume
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

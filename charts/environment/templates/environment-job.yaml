@@ -1,0 +1,72 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "environment.fullname" . }}
+  labels:
+    {{- include "environment.labels" . | nindent 4 }}
+    role: server
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        {{- include "environment.labels" . | nindent 8 }}
+        role: server
+      annotations:
+        openaios.4paradigm.com/app: "true"
+        openaios.4paradigm.com/computeunit.environment: {{ .Values.pineapple.default.resourceId }}
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ .Release.Namespace }}-svc-account
+      imagePullSecrets:
+        - name: harbor-registry-secret
+      containers:
+      - name: environment
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.pineapple.default.resources | nindent 10 }}
+        command:
+          - "sh"
+          - "/pineapple/script/entrypoint.sh"
+        env:
+          - name: USE_JUPYTER
+            value: "{{ .Values.serverType.jupyter }}"
+          - name: USE_SSH
+            value: "{{ .Values.serverType.ssh }}"
+        volumeMounts:
+        - mountPath: /pineapple/script
+          name: config-volume
+        - mountPath: /pineapple/secret
+          readOnly: true
+          name: secret-volume
+        {{- if .Values.pineapple.default.volumeMounts }}
+        {{- toYaml .Values.pineapple.default.volumeMounts | nindent 8 }}
+        {{- end }}
+        {{- if .Values.volumeMounts }}
+        {{- toYaml .Values.volumeMounts | nindent 8 }}
+        {{- end }}
+      volumes:
+      - configMap:
+          name: {{ include "environment.fullname" . }}
+          items:
+            - key: entrypoint.sh
+              path: entrypoint.sh
+        name: config-volume
+      - secret:
+          secretName: {{ include "environment.fullname" . }}
+          items:
+            - key: jupyter-token
+              path: jupyter/jupyter-token
+            {{- if eq .Values.serverType.ssh "True" }}
+            - key: ssh-key
+              path: ssh/ssh-key
+              mode: 0600
+            {{- end }}
+        name: secret-volume
+      - persistentVolumeClaim:
+          claimName: "{{ .Values.pvc.claimName }}"
+        name: user-storage
+      {{- if .Values.pineapple.default.volumes }}
+      {{- toYaml .Values.pineapple.default.volumes | nindent 6 }}
+      {{- end }}

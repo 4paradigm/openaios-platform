@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "pineapple.webterminal.fullname" . }}
+  labels:
+    {{- include "pineapple.webterminal.labels" . | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.expose.externalIngress.annotations | nindent 4 }}
+spec:
+  rules:
+    - host: {{ .Values.expose.externalIngress.host }}
+      http:
+        paths:
+        - backend:
+            service:
+              name: {{ include "pineapple.webterminal.fullname" . }}
+              port:
+                number: 8080
+          pathType: Prefix
+          path: "/terminal"
+        - backend:
+            service:
+              name: {{ include "pineapple.webterminal.fullname" . }}
+              port:
+                number: 80
+          pathType: Prefix
+          path: "/web-terminal"
+  {{- if .Values.expose.externalIngress.tls.enable }}
+  tls:
+    - hosts:
+      - {{ .Values.expose.externalIngress.host }}
+      secretName: {{ .Values.expose.externalIngress.tls.secretName }}
+  {{- end }}

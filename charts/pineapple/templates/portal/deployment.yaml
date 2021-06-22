@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pineapple.portal.fullname" . }}
+  labels:
+    {{- include "pineapple.portal.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "pineapple.portal.selectorLabels" . | nindent 6 }}
+  replicas: {{ .Values.portal.replicaCount }}
+  template:
+    metadata:
+      labels:
+        {{- include "pineapple.portal.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: portal
+        image: "{{ .Values.portal.image.repository }}:{{ .Values.portal.image.tag }}"
+        imagePullPolicy: {{ .Values.portal.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.portal.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: /www/keycloak-config.json
+          subPath: keycloak.json
+          readOnly: true
+          name: pineapple-config-volume
+      volumes:
+        - configMap:
+            name: "pineapple-config"
+            items:
+              - key: keycloak.json
+                path: keycloak.json
+          name: pineapple-config-volume
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

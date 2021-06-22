@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pineapple.webterminal.fullname" . }}
+  labels:
+    {{- include "pineapple.webterminal.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "pineapple.webterminal.labels" . | nindent 6 }}
+  replicas: {{ .Values.webterminal.replicaCount }}
+  template:
+    metadata:
+      labels:
+        {{- include "pineapple.webterminal.labels" . | nindent 8 }}
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '80'
+        prometheus.io/path: 'metrics'
+    spec:
+      containers:
+      - name: webterminal
+        image: "{{ .Values.webterminal.image.repository }}:{{ .Values.webterminal.image.tag }}"
+        imagePullPolicy: {{ .Values.webterminal.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.webterminal.resources.server | nindent 10 }}
+        command:
+          - "/root/web-terminal"
+        ports:
+          - containerPort: 80
+        env:
+          - name: PINEAPPLE_OIDC_CLIENT_ID
+            value: {{ .Values.keycloak.clientID }}
+          - name: PINEAPPLE_OIDC_KEYCLOAK_URL
+            value: {{ .Values.keycloak.url }}
+        volumeMounts:
+        - mountPath: /etc/ssl/certs/pineapple-ca.crt
+          subPath: ca.crt
+          readOnly: false
+          name: crt-secret-volume
+      - name: gotty
+        image: "{{ .Values.webterminal.image.repository }}:{{ .Values.webterminal.image.tag }}"
+        imagePullPolicy: {{ .Values.webterminal.image.pullPolicy }}
+        resources:
+          {{- toYaml .Values.webterminal.resources.gotty | nindent 10 }}
+        command:
+          - "/root/gotty"
+          - "--port=8080" 
+          - "--prefix=/terminal"
+          - "--title-format=Pineapple Web Terminal"
+          - "--permit-write"
+          - "--permit-arguments"
+          - "kubectl"
+        ports:
+          - containerPort: 8080
+      volumes:
+      - secret:
+          secretName: {{ .Values.rootCA }}
+        name: crt-secret-volume
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

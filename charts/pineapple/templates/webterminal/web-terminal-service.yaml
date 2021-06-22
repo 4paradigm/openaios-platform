@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pineapple.webterminal.fullname" . }}
+  labels:
+    {{- include "pineapple.webterminal.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      name: gotty
+    - port: 80
+      name: web-terminal-server
+  selector:
+    {{- include "pineapple.webterminal.selectorLabels" . | nindent 4 }}

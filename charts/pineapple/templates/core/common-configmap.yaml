@@ -1,0 +1,12 @@
+apiVersion: v1                                                                               
+kind: ConfigMap                                                                              
+metadata:                                                                                    
+  name: {{ include "pineapple.core.fullname" . }}
+  labels:
+    {{- include "pineapple.core.labels" . | nindent 4 }}
+data:
+  cephfs-info.yaml: |
+    {{- toYaml .Values.userCeph.cephfs | nindent 4 }}
+
+  appConf.yaml: |
+    {{- toYaml .Values.appConf | nindent 4 }}

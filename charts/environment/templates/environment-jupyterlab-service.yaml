@@ -1,0 +1,18 @@
+{{- if eq .Values.serverType.jupyter "True" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "environment.fullname" . }}-jupyterlab
+  labels:
+    {{- include "environment.labels" . | nindent 4 }}
+    role: jupyter-service
+spec:
+  type: ClusterIP
+  ports:
+    {{- if eq .Values.serverType.jupyter "True" }}
+    - port: 8888
+      name: jupyter-lab
+    {{- end }}
+  selector:
+    {{- include "environment.selectorLabels" . | nindent 4 }}
+{{- end }}

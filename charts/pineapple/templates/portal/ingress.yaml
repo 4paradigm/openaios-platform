@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "pineapple.portal.fullname" . }}
+  labels:
+    {{- include "pineapple.portal.labels" . | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.expose.externalIngress.annotations | nindent 4 }}
+spec:
+  rules:
+    - host: {{ .Values.expose.externalIngress.host }}
+      http:
+        paths:
+        - backend:
+            service:
+              name: {{ include "pineapple.portal.fullname" . }}
+              port:
+                number: {{ .Values.expose.service.port }}
+          pathType: Prefix
+          path: "/"
+  {{- if .Values.expose.externalIngress.tls.enable }}
+  tls:
+    - hosts:
+      - {{ .Values.expose.externalIngress.host }}
+      secretName: {{ .Values.expose.externalIngress.tls.secretName }}
+  {{- end }}

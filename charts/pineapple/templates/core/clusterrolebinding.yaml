@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "pineapple.core.fullname" . }}-{{ .Release.Namespace }}-cluster-admin
+  labels:
+    {{- include "pineapple.core.labels" . | nindent 4 }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "pineapple.core.fullname" . }}
+  apiGroup: ""
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io

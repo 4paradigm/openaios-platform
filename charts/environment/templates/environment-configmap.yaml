@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "environment.fullname" . }}
+  labels:
+    {{- include "environment.labels" . | nindent 4 }}
+data:
+  entrypoint.sh: |
+    if [ ${USE_SSH} = "True" ]; then
+      mkdir /run/sshd
+      CAT_PATH=$(which cat)
+      /usr/sbin/sshd \
+      -o "AuthorizedKeysCommand ${CAT_PATH} /pineapple/secret/ssh/ssh-key" \
+      -o "AuthorizedKeysCommandUser root"
+      if [ $? -ne 0 ]; then
+        echo "ERROR: ssh start failed!"
+        exit 1
+      fi
+    fi
+    if [ ${USE_JUPYTER} = "True" ]; then
+      exec jupyter-lab --debug --no-browser \
+      --ip="0.0.0.0" \
+      --port=8888 \
+      --allow-root \
+      --LabApp.token="{{ .Values.jupyter.token }}" \
+      --LabApp.password='' \
+      --LabApp.base_url="/ingress/{{ .Release.Namespace }}/env/{{ .Release.Name }}/jupyterlab"
+    elif [ ${USE_JUPYTER} = "False" ]; then
+      exec tail -f /dev/null
+    fi

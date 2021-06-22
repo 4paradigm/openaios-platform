@@ -1,0 +1,7 @@
+[env]
+keycloakURL = "https://keycloak.pineapple-test.com/auth"
+username = "shiyoubun"
+password = "123"
+clientid = "pineapple"
+billingServerURL = "http://localhost:4321/api"
+endpointURL = "https://develop.pineapple-test.com/api"

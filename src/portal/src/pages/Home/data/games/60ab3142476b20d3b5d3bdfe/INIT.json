@@ -1,0 +1,21 @@
+{
+  "name": "pafka",
+  "config": {
+    "image": {
+      "repo": "env/game/pafka",
+      "tag": "latest",
+      "source": "public"
+    },
+    "mounts": [
+    ],
+    "compute_unit": "PMEM",
+    "ssh": {
+      "enable": false,
+      "id_rsa.pub": ""
+    },
+    "jupyter": {
+      "enable": true,
+      "token": "ai4every1"
+    }
+  }
+}
