@@ -23,14 +23,7 @@ COPY ./src ./src
 RUN cd src && CGO_ENABLED=0 go build -v -o /bin/web-terminal ./webterminal/server
 RUN cd src && CGO_ENABLED=0 go build -v -o /bin/gotty ./webterminal/gotty
 
-FROM ubuntu:18.04
-USER root
-RUN apt-get update \
-    && apt-get install -y apt-transport-https ca-certificates curl \
-    && curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list \
-    && apt-get update \
-    && apt-get install -y kubectl
+FROM bitnami/kubectl:1.20.9
 
 WORKDIR /root
 

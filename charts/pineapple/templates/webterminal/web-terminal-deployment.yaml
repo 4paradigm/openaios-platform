@@ -45,9 +45,10 @@ spec:
           {{- toYaml .Values.webterminal.resources.gotty | nindent 10 }}
         command:
           - "/root/gotty"
+        args:
           - "--port=8080" 
           - "--prefix=/terminal"
-          - "--title-format=Pineapple Web Terminal"
+          - "--title-format=OpenAIOS Web Terminal"
           - "--permit-write"
           - "--permit-arguments"
           - "kubectl"
