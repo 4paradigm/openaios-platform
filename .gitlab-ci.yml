@@ -18,8 +18,6 @@ build_core_image:
     - docker push ${IMAGE_TAG}
   only:
     - master
-    - cicd
-    - feat/hideSensitive
 
 build_billing_image:
   stage: build
@@ -31,8 +29,6 @@ build_billing_image:
     - docker push ${IMAGE_TAG}
   only:
     - master
-    - cicd
-    - feat/hideSensitive
 
 build_webterminal_image:
   stage: build
@@ -44,8 +40,6 @@ build_webterminal_image:
     - docker push ${IMAGE_TAG}
   only:
     - master
-    - cicd
-    - feat/hideSensitive
 
 build_webhook_image:
   stage: build
@@ -57,5 +51,3 @@ build_webhook_image:
     - docker push ${IMAGE_TAG}
   only:
     - master
-    - cicd
-    - feat/hideSensitive
