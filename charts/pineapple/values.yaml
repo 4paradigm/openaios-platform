@@ -2,8 +2,8 @@ version: unknown
 
 core:
   image:
-    repository: 
-    tag: 
+    repository: docker.4pd.io/adc/pineapple/core
+    tag: latest
     pullPolicy: IfNotPresent
 
   resources:
@@ -16,6 +16,7 @@ core:
 
   replicaCount: 1
 
+  # 此处的ENV配置都会加入到core模块对Pod的环境变量中
   extraEnv:
     PINEAPPLE_ENV_CHARTSDIR: /root/charts/environment
 
@@ -24,14 +25,14 @@ core:
     PINEAPPLE_PVC_CEPH_JSON_DIR: /root/config/cephfs-info.yaml
 
     # mongodb
-    PINEAPPLE_MONGODB_URL: 
-    PINEAPPLE_MONGODB_DATABASE: 
+    PINEAPPLE_MONGODB_URL: mongodb://localhost:27017
+    PINEAPPLE_MONGODB_DATABASE: myapp
 
 webterminal:
   replicaCount: 1
   image:
-    repository: 
-    tag: 
+    repository: docker.4pd.io/adc/pineapple/webterminal
+    tag: 21.4.1
     pullPolicy: Always
   resources:
     server:
@@ -53,8 +54,8 @@ portal:
   replicaCount: 1
 
   image:
-    repository: 
-    tag: 
+    repository: docker.4pd.io/adc/pineapple/portal
+    tag: latest
     pullPolicy: IfNotPresent
 
   resources:
@@ -69,8 +70,8 @@ billing:
   replicaCount: 1
 
   image:
-    repository: 
-    tag: 
+    repository: docker.4pd.io/adc/pineapple/billing
+    tag: 0.1.1
     pullPolicy: IfNotPresent
 
   resources:
@@ -82,17 +83,16 @@ billing:
       memory: 4Gi
 
   mongodb:
-    # required
-    dbName:
-    # required
-    url:
+    dbName: mydb
+    url: mongodb://localhost:27017
 
+  # 此处的ENV配置都会加入到core模块对Pod的环境变量中，一般来说不需要填写
   extraEnv:
 
 webhook:
   image:
-    repository: 
-    tag: 
+    repository: docker.4pd.io/adc/pineapple/webhook
+    tag: latest
     pullPolicy: Always
   resources:
     limits:
@@ -104,54 +104,72 @@ webhook:
   port:
     containerPort: 8443
     servicePort: 443
+  # webhook所使用证书，由于是集群内部认证，推荐使用自签证书或者如下证书
   tls:
-    cert: 
-    key: 
-    ca: 
+    # required
+    cert:
+    # required
+    key:
+    # required
+    ca:
 
+# 集群大部分服务签发所用的根证书，主要是方便内部绕到外部访问keycloak等服务的https端口
+# 目前主要是core模块以及webterminal模块使用
 rootCA: "pineapple-ca"
 
 keycloak:
-  clientID: pineapple
-  url: 
+  # required
+  clientID:
+  # required
+  url:
 
 harbor:
-  url: 
+  url: https://harbor.pineapple.com:32443
   basepath: /api/v2.0
   basepathV1: /api
+  # 每个用户在harbor上使用的存储上限
   storage: "50000000000" # 50G
-  admin_username: 
-  admin_password: 
+  admin_username: admin
+  admin_password: password
 
 userCeph:
   cephfs:
     monitors:
-    path: 
-    user: 
+      - localhost
+    path: /inf
+    user: pineappleUser
   cephSecret:
-    key: 
+    key: secret
 
+# 这个ceph的账号需要p权限，能够调整用户使用额度上限
 webserverCeph:
   cephfs:
     monitors:
-    path: 
-    user: 
+      - 172.24.15.114
+    path: /inf
+    user: pineappleAdmin
   cephSecret:
-    key: 
+    key: secret
   capacity:
     storage: 20Gi
 
+# 对外开放访问配置
 expose:
-  externalUsersDomain: 
+  # 用户自己应用中暴露的服务对应的域名
+  externalUsersDomain: users.pineapple-test.com
+
+  # pineapple项目组件对外的service配置，一般不需要改，特定情况下可以改为NodePort
   service:
     type: ClusterIP
     port: 80
+
+  # host以及url需要配对, proxy-body-size 以及 proxy-buffer-size 比较重要，在keycloak对应的ingress中需要配置，否则某些请求无法处理
   externalIngress:
-    host: 
+    host: pineapple.com
     tls:
       enable: false
       secretName: pineapple-tls
-    url: 
+    url: https://pineapple.com:32443
     annotations:
       kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/proxy-body-size: 1g

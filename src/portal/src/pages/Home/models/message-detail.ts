@@ -1,15 +1,15 @@
 /*
  * @Author: liyuying
  * @Date: 2021-04-23 11:55:28
- * @LastEditors: liyuying
- * @LastEditTime: 2021-06-10 14:47:00
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-07-12 13:27:43
  * @Description: file content
  */
 import { Model } from 'dva';
 import { history } from 'umi';
 import { CompetitionApiApiInstance, EnvironmentsApiInstance } from '@/openApi';
 import { IAction } from '@/interfaces';
-import { IMessage } from '@/interfaces/bussiness';
+import { IMessage, ISsh } from '@/interfaces/bussiness';
 import { message } from 'cess-ui';
 import { DEV_ENVIRONMENT } from '@/router/url';
 import { delay } from '@/utils';
@@ -23,17 +23,29 @@ export const MessageDetailAction = {
 
 export interface IMessageDetailState {
   msgInfo: IMessage;
+  ssh: ISsh;
+  // ISsh:
+  // {
+  //   enable: true,
+  //   'id_rsa.pub': ''
+  // },
   modalLoading: boolean;
   /* 是否已报名 */
   hasApplied: boolean;
   invitePersonNum: number;
+  hasData: boolean;
 }
 
 const defaultState: IMessageDetailState = {
   msgInfo: { id: 0, name: '', descriptionMd: '', title: '', avl: false },
+  ssh: {
+    enable: false,
+    'id_rsa.pub': '',
+  },
   modalLoading: false,
   hasApplied: false,
   invitePersonNum: 0,
+  hasData: false,
 };
 
 const messageDetail: Model = {
@@ -63,6 +75,10 @@ const messageDetail: Model = {
       const { data }: any = yield call(
         CompetitionApiApiInstance.competitionGet.bind(CompetitionApiApiInstance),
       );
+
+      // console.log( 'getMessageInfo-data:', data );
+      // console.log( 'getMessageInfo-payload:', payload );
+
       if (data) {
         let message = {};
         data.forEach((element: IMessage) => {
@@ -70,9 +86,12 @@ const messageDetail: Model = {
           if (element.id && payload === element.id) {
             element.title = `【比赛】${element.name}`;
             try {
+              // ../data/games/这个目录下的文件可能不存在，所以目前使用try...catch...
+              // 今天问雨瀛用try...catch...的缘由，嗯，是因为这些文件可能不存在
               element.descriptionMd = require(`../data/games/${element.id}/README.md`).default;
             } catch (error) {}
             try {
+              // ../data/games/这个目录下的文件可能不存在，所以目前使用try...catch...
               // 初始化环境的配置
               const initEnvJson = require(`../data/games/${element.id}/INIT.json`);
               if (initEnvJson) {
@@ -80,6 +99,7 @@ const messageDetail: Model = {
               }
             } catch (error) {}
             try {
+              // ../data/games/这个目录下的文件可能不存在，所以目前使用try...catch...
               // 调查问卷
               const queryFormn = require(`../data/games/${element.id}/FORM.json`);
               if (queryFormn && queryFormn.form) {
@@ -87,6 +107,7 @@ const messageDetail: Model = {
               }
             } catch (error) {}
             try {
+              // ../data/games/这个目录下的文件可能不存在，所以目前使用try...catch...
               // 邀请规则
               element.ruleMd = require(`../data/games/${element.id}/RULE.md`).default;
             } catch (error) {}
@@ -94,10 +115,12 @@ const messageDetail: Model = {
             message = element;
           }
         });
+        // console.log( 'getMessageInfo-updateState-message:', message );
         yield put({
           type: 'updateState',
           payload: {
             msgInfo: message,
+            hasData: true,
           },
         });
       }
@@ -185,7 +208,10 @@ const messageDetail: Model = {
     },
     // 初始化环境
     *initEnv({ payload }, { call, put }) {
-      const initEnvJson = payload.initEnvJson;
+      const { msgInfo, ssh } = payload;
+      const initEnvJson = msgInfo.initEnvJson;
+      // console.log('initEnv-initEnvJson：', initEnvJson );
+      // console.log('initEnv-payload：', payload );
       yield put({
         type: 'updateState',
         payload: {
@@ -193,6 +219,11 @@ const messageDetail: Model = {
         },
       });
       if (initEnvJson) {
+        const initEnvJsonConfig = initEnvJson.config;
+        initEnvJson.config = {
+          ...initEnvJsonConfig,
+          ssh: ssh,
+        };
         const { data } = yield call(
           EnvironmentsApiInstance.createEnvironment.bind(
             EnvironmentsApiInstance,

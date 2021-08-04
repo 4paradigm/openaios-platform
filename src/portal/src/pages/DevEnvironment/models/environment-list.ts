@@ -2,7 +2,7 @@
  * @Author: liyuying
  * @Date: 2021-04-28 16:20:43
  * @LastEditors: liyuying
- * @LastEditTime: 2021-06-21 17:21:06
+ * @LastEditTime: 2021-07-05 20:47:21
  * @Description: file content
  */
 import { Model } from 'dva';
@@ -12,24 +12,29 @@ import { IAction } from '@/interfaces';
 import { delay } from '@/utils';
 import { message } from 'cess-ui';
 import { ENVIRONMENT_STATUS } from '@/constant/environment';
+import { EnvironmentRuntimeInfo, ApplicationInstanceEvent } from '@/openApi/api';
 
 export const EnvironmentListAction = {
-  UPDATE_STATUS: 'environmentList/updateStatus',
+  UPDATE_STATUS: 'environmentList/updateState',
   GET_LIST: 'environmentList/getList',
   DELETE_ENVIRONMENT: 'environmentList/deleteEnvironment',
   OPEN_TERMINAL: 'environmentList/openWebTerminal',
 };
 
 export interface IEnvironmentListState {
-  dataSource: any;
+  dataSource: EnvironmentRuntimeInfo[];
   total: number;
   currentPage: number;
+  eventVisible: boolean;
+  eventList: ApplicationInstanceEvent[];
 }
 
 const defaultState: IEnvironmentListState = {
   dataSource: [],
   total: 0,
   currentPage: 1,
+  eventVisible: false,
+  eventList: [],
 };
 
 const environmentList: Model = {

@@ -3,14 +3,14 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/billingclient"
 	"github.com/4paradigm/openaios-platform/src/internal/mongodb"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,6 +30,7 @@ type CompetitionInfo struct {
 	Beginning        *time.Time `bson:"beginning,omitempty"`
 	Deadline         *time.Time `bson:"deadline,omitempty"`
 	ComputeunitGroup string     `bson:"computeunitGroup,omitempty"`
+	BaseParticipants int64      `bson:"baseParticipants,omitempty"`
 }
 
 var mongodbCompetitionsColl = "competitions"
@@ -174,15 +175,6 @@ func (handler *Handler) GetCompetition(ctx echo.Context, params apigen.GetCompet
 			ctx.Logger().Warn(errors.Wrap(err, "cannot decode document "+utils.GetRuntimeLocation()))
 			continue
 		}
-		if !params.Beginning.IsZero() && competitionInfo.Deadline != nil && params.Beginning.After(*competitionInfo.Deadline) {
-			continue
-		}
-		if params.Beginning.IsZero() && time.Now().After(*competitionInfo.Deadline) {
-			continue
-		}
-		if !params.End.IsZero() && competitionInfo.Beginning != nil && params.End.Before(*competitionInfo.Beginning) {
-			continue
-		}
 		beginning := *competitionInfo.Beginning
 		deadline := *competitionInfo.Deadline
 		id := competitionInfo.ID
@@ -195,15 +187,29 @@ func (handler *Handler) GetCompetition(ctx echo.Context, params apigen.GetCompet
 		}
 		if computeunitGroup == nil {
 			avl = false
+			if !params.Beginning.IsZero() && competitionInfo.Deadline != nil && params.Beginning.After(*competitionInfo.Deadline) {
+				continue
+			}
+			if params.Beginning.IsZero() && time.Now().After(*competitionInfo.Deadline) {
+				continue
+			}
+			if !params.End.IsZero() && competitionInfo.Beginning != nil && params.End.Before(*competitionInfo.Beginning) {
+				continue
+			}
 		}
 		for _, unit := range computeunitGroup {
 			ID := apigen.ComputeUnitId(*unit.Id)
 			computeunitList = append(computeunitList, apigen.ComputeUnitSpec{
 				Id: &ID, Price: unit.Price, Description: unit.Description})
 		}
+		participant, err := mongodb.CountDocuments(client, database, id, "")
+		if err != nil {
+			ctx.Logger().Warn(errors.Wrap(err, "cannot get competition participant "+utils.GetRuntimeLocation()))
+		}
+		participant += competitionInfo.BaseParticipants
 
 		competitionList = append(competitionList,
-			apigen.CompetitionInfo{Id: &id, Name: &name, Beginning: &beginning, Avl: &avl,
+			apigen.CompetitionInfo{Id: &id, Name: &name, Beginning: &beginning, Avl: &avl, Participant: &participant,
 				Deadline: &deadline, ComputingResource: &computeunitList})
 	}
 	return ctx.JSON(http.StatusOK, competitionList)

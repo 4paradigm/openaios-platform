@@ -1,10 +1,10 @@
 package environment
 
 import (
+	"github.com/fatih/structs"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/handler/models"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
-	"github.com/fatih/structs"
 )
 
 type EnvironmentInfo struct {

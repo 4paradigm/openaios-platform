@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"github.com/labstack/echo/v4"
 	"github.com/4paradigm/openaios-platform/src/webterminal/server/apigen"
 	"github.com/4paradigm/openaios-platform/src/webterminal/server/controller/webterminal"
-	"github.com/labstack/echo/v4"
 	"net/http"
 )
 

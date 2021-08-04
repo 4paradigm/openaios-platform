@@ -1,0 +1,76 @@
+stages:
+  - build
+
+variables:
+  CORE_IMAGE_REGISTRY: 'docker.4pd.io/adc/pineapple/core'
+  BILLING_IMAGE_REGISTRY: 'docker.4pd.io/adc/pineapple/billing'
+  PORTAL_IMAGE_REGISTRY: 'docker.4pd.io/adc/pineapple/portal'
+  WEBTERMINAL_IMAGE_REGISTRY: 'docker.4pd.io/adc/pineapple/webterminal'
+  WEBHOOK_IMAGE_REGISTRY: 'docker.4pd.io/adc/pineapple/webhook'
+
+build_core_image:
+  stage: build
+  image: 'docker.4pd.io/build:11.0'
+  before_script:
+    - IMAGE_TAG=${CORE_IMAGE_REGISTRY}:${CI_COMMIT_SHA}
+  script:
+    - docker build -t ${IMAGE_TAG} -f ./dockerfile/webserver/Dockerfile .
+    - docker push ${IMAGE_TAG}
+  only:
+    - master
+    - cicd
+    - feat/hideSensitive
+
+build_billing_image:
+  stage: build
+  image: 'docker.4pd.io/build:11.0'
+  before_script:
+    - IMAGE_TAG=${BILLING_IMAGE_REGISTRY}:${CI_COMMIT_SHA}
+  script:
+    - docker build -t ${IMAGE_TAG} -f ./dockerfile/billing-server/Dockerfile .
+    - docker push ${IMAGE_TAG}
+  only:
+    - master
+    - cicd
+    - feat/hideSensitive
+
+build_portal_image:
+  stage: build
+  image: 'docker.4pd.io/build:11.0'
+  before_script:
+    - IMAGE_TAG=${PORTAL_IMAGE_REGISTRY}:${CI_COMMIT_SHA}
+  script:
+    - sonar-scanner -Dsonar.projectKey=pineapple-fe -Dsonar.sources=./src/portal/src -Dsonar.host.url=https://sonar.4pd.io -Dsonar.login=737e74927068f1844141b4b7ede00a6cf419630f
+    - docker build -t ${IMAGE_TAG} -f ./dockerfile/portal/Dockerfile .
+    - docker push ${IMAGE_TAG}
+  only:
+    - master
+    - cicd
+    - feat/fe
+    - feat/hideSensitive
+
+build_webterminal_image:
+  stage: build
+  image: 'docker.4pd.io/build:11.0'
+  before_script:
+    - IMAGE_TAG=${WEBTERMINAL_IMAGE_REGISTRY}:${CI_COMMIT_SHA}
+  script:
+    - docker build -t ${IMAGE_TAG} -f ./dockerfile/webterminal/Dockerfile .
+    - docker push ${IMAGE_TAG}
+  only:
+    - master
+    - cicd
+    - feat/hideSensitive
+
+build_webhook_image:
+  stage: build
+  image: 'docker.4pd.io/build:11.0'
+  before_script:
+    - IMAGE_TAG=${WEBHOOK_IMAGE_REGISTRY}:${CI_COMMIT_SHA}
+  script:
+    - docker build -t ${IMAGE_TAG} -f ./dockerfile/webhook/Dockerfile .
+    - docker push ${IMAGE_TAG}
+  only:
+    - master
+    - cicd
+    - feat/hideSensitive

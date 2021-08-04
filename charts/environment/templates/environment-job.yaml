@@ -13,7 +13,6 @@ spec:
         {{- include "environment.labels" . | nindent 8 }}
         role: server
       annotations:
-        openaios.4paradigm.com/app: "true"
         openaios.4paradigm.com/computeunit.environment: {{ .Values.pineapple.default.resourceId }}
     spec:
       restartPolicy: Never

@@ -2,9 +2,9 @@ package application
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
-	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/api/core/v1"
@@ -250,8 +250,6 @@ func parseReleaseToInstanceInfo(r *release.Release) (*ApplicationInstanceInfo, e
 		Duration:     time.Now().Sub(r.Info.FirstDeployed.Time),
 		Status:       string(r.Info.Status),
 	}
-	//pineappleValues := r.Chart.Values["pineapple"].(map[string]interface{})
-	//info.InstanceId = pineappleValues["instance"].(string)
 	return &info, nil
 }
 

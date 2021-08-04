@@ -2,14 +2,14 @@ package handler
 
 import (
 	"flag"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/controller/environment"
 	"github.com/4paradigm/openaios-platform/src/pineapple/handler/models"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"net/http"
@@ -188,14 +188,7 @@ func checkCreateEnvironmentJSONRequestBody(requestBody *apigen.CreateEnvironment
 			requestBodyError.keyErrors["jupyter.enable"] = "无效输入"
 		}
 		if requestBody.Jupyter.Token == nil {
-			requestBodyError.keyErrors["jupyter.token"] = "无效输入"
-		}
-		if requestBody.Jupyter.Enable != nil && requestBody.Jupyter.Token != nil {
-			if *requestBody.Jupyter.Enable {
-				if *requestBody.Jupyter.Token == "" {
-					requestBodyError.keyErrors["jupyter.token"] = "无效输入"
-				}
-			}
+			*requestBody.Jupyter.Token = ""
 		}
 	}
 	if requestBody.Ssh == nil {
@@ -345,6 +338,7 @@ func parseEnvironmentRuntimeInfoToResponse(envInfo *environment.EnvironmentRelea
 			Name:        &envName,
 			NotebookUrl: envInfo.StaticInfo.NotebookUrl,
 		},
+		Events: envInfo.Events,
 	}
 	return &envInfoResponse, nil
 }

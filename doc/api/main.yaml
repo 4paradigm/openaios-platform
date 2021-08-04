@@ -835,9 +835,10 @@ paths:
             $ref: "#/components/schemas/ImageRepo"
           required: true
         - in: query
-          name: tag
+          name: reference
           schema:
-            $ref: "#/components/schemas/ImageTag"
+            type: string
+          description: tag or digest
           required: true
       responses:
         200:
@@ -1323,6 +1324,7 @@ components:
       type: object
       properties:
         repo:
+          example: m7-ieg-pico-test01:5000/fuhao/pineapple/env/tensorflow
           type: string
         tag:
           example: 20.12-tf2-py3
@@ -1349,7 +1351,7 @@ components:
               example: true
               type: boolean
             id_rsa.pub:
-              example: ssh-rsa XXXX
+              example: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAAMfJkdGFHw+tcovIkSSk5sayb/2uid8vdcc9unEGSk74sZMJrN2yMd52sUnvdNaSp2VLVZ/CfpuKs3coKj335neyEcN4PKsv6KFywFa0DaHZ0Uzbp6k6/ThBKIi8kNQfkgKXlf2L04Z6PqgFkfRiS4gYKLSF/yZQ+VXYpnnzzCUAeLsCL7Vy1ZHSIbmx74neUxp1y8eBCN6cD9qEHW2aespg0wK2tM4dsTyb3av1FIP44wP6cOx0ZK6WhDhkIEmkvbfN/HhhF9HqCKciq/pQxyP10k3VxgcEYZUZOnlzdgUugHNOLi2oE9lGNWyPU9cl2wyE4bUV1zz4OI6wbqPL liwenhao@liwenhaodeMBP-2.4pd.io
               type: string
         jupyter:
           type: object
@@ -1406,6 +1408,10 @@ components:
           $ref: "#/components/schemas/EnvironmentRuntimeSshInfo"
         pod_name:
           type: string
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplicationInstanceEvent"
     EnvironmentRuntimeInfos:
       description: environment runtime information list
       type: object
@@ -1711,6 +1717,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ImageTag"
+        digest:
+          type: string
         size:
           type: string
         importing_time:
@@ -1787,6 +1795,9 @@ components:
           format: date-time
         avl:
           type: boolean
+        participant:
+          type: integer
+          format: int64
         computingResource:
           type: array
           items:

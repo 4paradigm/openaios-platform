@@ -2,7 +2,7 @@
  * @Author: liyuying
  * @Date: 2021-04-23 11:55:28
  * @LastEditors: liyuying
- * @LastEditTime: 2021-06-10 16:19:52
+ * @LastEditTime: 2021-07-02 11:20:52
  * @Description: file content
  */
 import { ENVIRONMENT_STATUS } from '@/constant/environment';
@@ -131,6 +131,8 @@ export interface IMessage {
   initDeadline?: number | string;
   /* 初始化环境的JSON */
   initEnvJson?: { name: string; config: any };
+  /* 已参与人数 */
+  participant?: number;
 }
 
 // banner对象

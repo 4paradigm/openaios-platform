@@ -2,7 +2,7 @@
  * @Author: liyuying
  * @Date: 2021-05-21 16:05:14
  * @LastEditors: liyuying
- * @LastEditTime: 2021-06-20 13:06:29
+ * @LastEditTime: 2021-06-22 15:54:58
  * @Description: 查看应用实例
  */
 import React, { useEffect } from 'react';
@@ -99,7 +99,7 @@ const ApplicationInstanceDetail = ({ match }: any) => {
             key={APPLICATION_INSTANCE_DETAIL_TABS.NOTES}
           >
             <ApplicationInstanceDetailNotes
-              instance_name={appInstance.instance_name || ''}
+              instance_name={match.params.name || ''}
             ></ApplicationInstanceDetailNotes>
           </Tabs.TabPane>
           <Tabs.TabPane
@@ -107,7 +107,7 @@ const ApplicationInstanceDetail = ({ match }: any) => {
             key={APPLICATION_INSTANCE_DETAIL_TABS.PODS}
           >
             <ApplicationInstanceDetailPods
-              instance_name={appInstance.instance_name || ''}
+              instance_name={match.params.name || ''}
             ></ApplicationInstanceDetailPods>
           </Tabs.TabPane>
           <Tabs.TabPane
@@ -115,7 +115,7 @@ const ApplicationInstanceDetail = ({ match }: any) => {
             key={APPLICATION_INSTANCE_DETAIL_TABS.SERVICE}
           >
             <ApplicationInstanceDetailService
-              instance_name={appInstance.instance_name || ''}
+              instance_name={match.params.name || ''}
             ></ApplicationInstanceDetailService>
           </Tabs.TabPane>
         </Tabs>

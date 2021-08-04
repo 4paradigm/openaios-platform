@@ -19,7 +19,9 @@ func (h *HelmClientImpl) GetPodList(helmReleaseInfo IHelmReleaseInfo) (*[]v1.Pod
 	if err != nil {
 		return nil, errors.WithMessage(err, "GetKubernetesClient error: ")
 	}
-	labelSelector := "app.kubernetes.io/managed-by=Helm" + "," + "app.kubernetes.io/instance=" + releaseName
+
+	labelSelector := "openaios.4paradigm.com/app=true" + "," + "app.kubernetes.io/instance=" + releaseName
+
 	podList, err := utils.GetPodList(client, labelSelector, *h.Config.Namespace)
 	if err != nil {
 		return nil, errors.WithMessage(err, "GetPodList error: ")
@@ -40,7 +42,9 @@ func (h *HelmClientImpl) GetServiceList(helmReleaseInfo IHelmReleaseInfo) (*[]v1
 	if err != nil {
 		return nil, errors.WithMessage(err, "GetKubernetesClient error: ")
 	}
-	labelSelector := "app.kubernetes.io/managed-by=Helm" + "," + "app.kubernetes.io/instance=" + releaseName
+
+	labelSelector := "openaios.4paradigm.com/app=true" + "," + "app.kubernetes.io/instance=" + releaseName
+
 	svcList, err := utils.GetServiceList(client, labelSelector, *h.Config.Namespace)
 	if err != nil {
 		return nil, errors.WithMessage(err, "GetPodList error: ")

@@ -39,11 +39,13 @@ const MirrorPublic = () => {
         title: '仓库名',
         dataIndex: 'repo',
         key: 'repo',
+        width: '390px',
       },
       {
         title: 'Tags',
         dataIndex: 'tags',
         key: 'tags',
+        width: '300px',
         render: (value: any) => {
           return value.join(',');
         },

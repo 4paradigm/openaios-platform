@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "ES2019",
+    "allowJs": true,
+    "outDir": "lib",
     "module": "esnext",
     "moduleResolution": "node",
     "importHelpers": true,

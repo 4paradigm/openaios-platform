@@ -2,11 +2,11 @@
  * @Author: liyuying
  * @Date: 2021-05-21 16:34:38
  * @LastEditors: liyuying
- * @LastEditTime: 2021-06-20 17:41:13
+ * @LastEditTime: 2021-06-23 00:08:52
  * @Description: 应用商店
  */
 import React, { useEffect } from 'react';
-import { history, useDispatch, useSelector } from 'umi';
+import { history, useDispatch, useSelector, ICommonState } from 'umi';
 import { Breadcrumb, Icon, Avatar, OverflowToolTip } from 'cess-ui';
 import { APPLICATION_INSTANCE_CREATE, APPLICATION_CHART_CREATE } from '@/router/url';
 import { IApplicationChartState, ApplicationChartAction } from '../models/application-chart';
@@ -26,6 +26,7 @@ const breadcrumb = (
 );
 const ApplicationChart = () => {
   const dispatch = useDispatch();
+  const { isMobile }: ICommonState = useSelector((state: any) => state.common);
   const { dataSource, publicChartCount, isLoading }: IApplicationChartState = useSelector(
     (state: any) => state.applicationChart,
   );
@@ -34,9 +35,13 @@ const ApplicationChart = () => {
    * @param item
    */
   const handleCreateInstance = (item: ChartMetadata) => {
-    history.push(
-      `${APPLICATION_INSTANCE_CREATE}/${item.name}?version=${item.version}&category=${item.category}`,
-    );
+    // 移动端只能查看，不能创建
+    if (isMobile) {
+    } else {
+      history.push(
+        `${APPLICATION_INSTANCE_CREATE}/${item.name}?version=${item.version}&category=${item.category}`,
+      );
+    }
   };
   /**
    * 创建我的应用
@@ -77,6 +82,7 @@ const ApplicationChart = () => {
                 icon={<Icon type="application" />}
                 src={item.icon_link}
               />
+
               <div className="application-chart-item-name">
                 <OverflowToolTip
                   title={item.showName || item.name}
@@ -104,7 +110,13 @@ const ApplicationChart = () => {
     });
   }, []);
   return (
-    <div className="application-chart comm-create-page">
+    <div
+      className={
+        isMobile
+          ? 'application-chart comm-create-page mobile'
+          : 'application-chart comm-create-page'
+      }
+    >
       {breadcrumb}
       {isLoading ? (
         <Loading></Loading>

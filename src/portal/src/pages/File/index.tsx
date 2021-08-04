@@ -170,6 +170,7 @@ function File() {
         title: '名称',
         dataIndex: 'name',
         key: 'name',
+        width: '240px',
         render: (value, record) => {
           return (
             <div className="column-name">

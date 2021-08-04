@@ -1,9 +1,9 @@
 package environment
 
 import (
+	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
-	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/time"
 )
 
@@ -58,12 +58,13 @@ type EnvironmentRuntimeStaticInfo struct {
 }
 
 type EnvironmentReleaseInfo struct {
-	SshInfo     *EnvironmentRuntimeSshInfo    `json:"sshInfo,omitempty"`
-	State       *EnvironmentState             `json:"state,omitempty"`
-	StaticInfo  *EnvironmentRuntimeStaticInfo `json:"staticInfo,omitempty"`
-	PodName     string                        `json:"pod_name,omitempty"`
-	ReleaseName string                        `json:"-"`
-	Type        string                        `json:"-"`
+	SshInfo     *EnvironmentRuntimeSshInfo         `json:"sshInfo,omitempty"`
+	State       *EnvironmentState                  `json:"state,omitempty"`
+	StaticInfo  *EnvironmentRuntimeStaticInfo      `json:"staticInfo,omitempty"`
+	PodName     string                             `json:"pod_name,omitempty"`
+	ReleaseName string                             `json:"-"`
+	Type        string                             `json:"-"`
+	Events      *[]apigen.ApplicationInstanceEvent `json:"events,omitempty"`
 }
 
 type EnvironmentReleaseInfos struct {
@@ -74,6 +75,7 @@ type EnvironmentReleaseInfos struct {
 type EnvironmentPodInfo struct {
 	PodName *string
 	State   *EnvironmentState
+	Events  *[]apigen.ApplicationInstanceEvent
 }
 
 func (e *EnvironmentReleaseInfo) GetReleaseName() (string, error) {

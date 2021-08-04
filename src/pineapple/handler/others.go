@@ -2,10 +2,10 @@ package handler
 
 import (
 	"context"
-	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
-	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
+	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
+	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"io"
 	"net/http"
 	"time"

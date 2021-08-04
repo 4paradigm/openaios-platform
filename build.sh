@@ -27,6 +27,13 @@ case $command in
     oapi-codegen -include-tags finished -generate types,server -package internalapigen ./doc/api/internal-api.yaml > ./src/pineapple/apigen/internalapigen/internalapi.gen.go
   ;;
 
+  run-local-dev)
+    mkdir -p ./build
+    ( cd src && go build -o ../build/pineapple ./pineapple )
+    args=$(tr "\\n" " " < ./configs/local-dev.conf)
+    env -vS "${args[@]}" ./build/pineapple --storage-root "${HOME}/shared" --debug
+  ;;
+
   billing-oapi-codegen)
     go get github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.5.5
     mkdir -p ./src/billing/apigen
@@ -43,6 +50,13 @@ case $command in
     go get github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.5.5
     mkdir -p ./src/webterminal/server/apigen
     oapi-codegen -include-tags finished -generate types,server -package apigen ./doc/api/webterminal.yaml > ./src/webterminal/server/apigen/serverapi.gen.go
+  ;;
+
+  billing-run-local-dev)
+    mkdir -p ./build
+    ( cd src && go build -o ../build/billing ./billing )
+    args=$(tr "\\n" " " < ./configs/billing-local-dev.conf)
+    env -vS "${args[@]}" ./build/billing
   ;;
   *)
     usage

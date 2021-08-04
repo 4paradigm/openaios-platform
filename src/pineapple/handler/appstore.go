@@ -3,14 +3,14 @@ package handler
 import (
 	"archive/tar"
 	"archive/zip"
+	"github.com/klauspost/compress/gzip"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
-	"github.com/klauspost/compress/gzip"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -18,6 +18,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 )
 
 type NamedFile struct {
@@ -101,6 +102,9 @@ func (handler *Handler) GetAppstoreChart(ctx echo.Context, category apigen.Chart
 	// Metadata & Files
 	chartVersionDetails, err := utils.GetChartrepoRepoChartsNameVersion(client, repo, name, version)
 	if err != nil {
+		if strings.Contains(err.Error(), "[404] getChartrepoRepoChartsNameVersionNotFound") {
+			return response.BadRequestWithMessagef(ctx, "无法找到应用%s，版本%s", name, version)
+		}
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
 	url := filepath.Join("chartrepo", repo, chartVersionDetails.Metadata.Urls[0])

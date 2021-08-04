@@ -1,8 +1,8 @@
 import { Model } from 'dva';
-import API from '@/services/api';
 import { IAction } from '@/interfaces';
 import { ITask } from '@/interfaces/bussiness';
 import { ImagesApiInstance } from '@/openApi';
+import { message } from 'cess-ui';
 
 export const PrivateImageAction = {
   GET_LIST: 'privateImage/getList',
@@ -16,6 +16,7 @@ export const PrivateImageAction = {
   GET_TOTAL: 'privateImage/getTotal',
   UPDATE_STATE: 'privateImage/updateState',
   INITT_DATA: 'privateImage/initData',
+  COPY_IMAGE: 'privateImage/copyImage',
 };
 
 export interface IMirrorPrivateState {
@@ -24,6 +25,9 @@ export interface IMirrorPrivateState {
   currentPage: number;
   modalVisible: boolean;
   modalLoading: boolean;
+  copyImageModalVisible: boolean;
+  copyImageLoading: boolean;
+  copyImageSourceImage: any;
   registryList: { url: string; id: number }[];
   taskModalVisible: boolean;
   taskList: ITask[];
@@ -35,6 +39,9 @@ const defaultState: IMirrorPrivateState = {
   currentPage: 1,
   modalVisible: false,
   modalLoading: false,
+  copyImageModalVisible: false,
+  copyImageLoading: false,
+  copyImageSourceImage: null,
   registryList: [],
   taskModalVisible: false,
   taskList: [],
@@ -90,9 +97,9 @@ const privateImage: Model = {
       }
     },
     *deleteImage({ payload }, { call, put, select }) {
-      const { repo, tag } = payload;
+      const { repo, digest } = payload;
       const { data } = yield call(
-        ImagesApiInstance.imagesDelete.bind(ImagesApiInstance, repo, tag),
+        ImagesApiInstance.imagesDelete.bind(ImagesApiInstance, repo, digest),
       );
       if (data) {
         let { currentPage, total } = yield select((state: any) => state.privateImage);
@@ -176,6 +183,38 @@ const privateImage: Model = {
       if (data) {
         yield put({
           type: 'getTaskList',
+        });
+      }
+    },
+    *copyImage({ payload }, { call, put }) {
+      yield put({
+        type: 'updateState',
+        payload: {
+          copyImageLoading: true,
+        },
+      });
+      const { data } = yield call(
+        ImagesApiInstance.imagesPut.bind(ImagesApiInstance),
+        payload.srcRepo,
+        payload.destRepo,
+        payload.tag,
+      );
+      if (data) {
+        yield put({
+          type: 'updateState',
+          payload: {
+            copyImageLoading: false,
+            copyImageModalVisible: false,
+          },
+        });
+        message.success('拷贝镜像成功');
+        yield put({ type: 'initData' });
+      } else {
+        yield put({
+          type: 'updateState',
+          payload: {
+            copyImageLoading: false,
+          },
         });
       }
     },

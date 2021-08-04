@@ -2,11 +2,11 @@ package utils
 
 import (
 	"context"
+	"github.com/labstack/gommon/log"
+	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/billing/conf"
 	"github.com/4paradigm/openaios-platform/src/internal/mongodb"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
-	"github.com/labstack/gommon/log"
-	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"k8s.io/apimachinery/pkg/types"
 	"net/http"
@@ -190,7 +190,7 @@ func CheckUserNoBalance(client *mongo.Client, billMap map[string]float64) error 
 
 func UpdateOrInsertPod(client *mongo.Client, pod PodInfo) error {
 	uniqueKey := PodInfo{PodUID: pod.PodUID}
-	podInfo := PodInfo{ComputeunitList: pod.ComputeunitList, StartTime: pod.StartTime,
+	podInfo := PodInfo{ComputeunitList: pod.ComputeunitList, StartTime: pod.StartTime, PodName: pod.PodName,
 		UpdateTime: pod.UpdateTime, PodUID: pod.PodUID, UserId: pod.UserId, InstanceId: pod.InstanceId}
 	setOperation := mongodb.MongodbOperation{Operator: "$set", Document: podInfo}
 	incOperation := mongodb.MongodbOperation{Operator: "$inc", Document: PodInfo{Count: 1}}

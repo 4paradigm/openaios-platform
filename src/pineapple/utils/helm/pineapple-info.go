@@ -9,18 +9,18 @@ import (
 
 type IPineappleInfo interface {
 	SetValues(values map[string]interface{})
-	GetName() (string)
-	GetUserId() (string)
-	GetPrefix() (string)
-	GetValues() (map[string]interface{})
+	GetName() string
+	GetUserId() string
+	GetPrefix() string
+	GetValues() map[string]interface{}
 	CreateChartValues() (map[string]interface{}, error)
 }
 
 type PineappleInfo struct {
-	Name       string
-	UserId     string
-	Prefix	   string
-	Values     map[string]interface{}
+	Name   string
+	UserId string
+	Prefix string
+	Values map[string]interface{}
 }
 
 func NewPineappleInfo(name string, userId string, prefix string) (*PineappleInfo, error) {
@@ -36,27 +36,27 @@ func NewPineappleInfo(name string, userId string, prefix string) (*PineappleInfo
 		return nil, errors.New("User does not have enough balance." + utils.GetRuntimeLocation())
 	}
 	pineappleInfo := PineappleInfo{
-		Name:       name,
-		UserId:     userId,
-		Prefix:     prefix,
-		Values:     nil,
+		Name:   name,
+		UserId: userId,
+		Prefix: prefix,
+		Values: nil,
 	}
 	return &pineappleInfo, nil
 }
 
-func (p *PineappleInfo) GetName() (string) {
+func (p *PineappleInfo) GetName() string {
 	return p.Name
 }
 
-func (p *PineappleInfo) GetUserId() (string) {
+func (p *PineappleInfo) GetUserId() string {
 	return p.UserId
 }
 
-func (p *PineappleInfo) GetPrefix() (string) {
+func (p *PineappleInfo) GetPrefix() string {
 	return p.Prefix
 }
 
-func (p *PineappleInfo) GetValues() (map[string]interface{}) {
+func (p *PineappleInfo) GetValues() map[string]interface{} {
 	return p.Values
 }
 

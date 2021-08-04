@@ -1,11 +1,11 @@
 pineapple:
   belongTo: user
   default:
-    resourceId: ""
+    resourceId: L-CPU
 
 image:
-  repository: ""
-  tag: ""
+  repository: m7-ieg-pico-test01:5000/fuhao/pineapple/env/tensorflow
+  tag: "20.12-tf2-py3"
   pullPolicy: Always
 
 serverType:
@@ -19,20 +19,20 @@ jupyter:
   token: ""
 
 pvc:
-  claimName: ""
+  claimName: "pineapple-pvc"
 
 volumeMounts:
-  - mountPath: ""
-    subPath: ""
+  - mountPath: "/workspace/sys"
+    subPath: "sys"
     name: user-storage
-  - mountPath: ""
-    subPath: ""
+  - mountPath: "/workspace/2"
+    subPath: "sys/dashboard"
     name: user-storage
 
 ingress:
-  host: ""
+  host: "pineapple.com"
   enableTLS: false
 
 appConf:
-  ingressClass: ""
+  ingressClass: nginx
 

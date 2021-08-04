@@ -1,21 +1,50 @@
 /*
  * @Author: liyuying
  * @Date: 2021-04-23 11:55:28
- * @LastEditors: liyuying
- * @LastEditTime: 2021-06-22 14:47:07
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2021-07-07 15:12:25
  * @Description: file content
  */
 import React, { useEffect, useState } from 'react';
 import GlobalHeader from '@/components/GlobalHeader';
-import styles from './index.less';
-import '@/assets/styles/layout.less';
+import './index.less';
+import '../assets/styles/layout.less';
 import { IAction } from '@/interfaces';
 import zhCN from 'antd/lib/locale/zh_CN';
 import { ConfigProvider, notification } from 'cess-ui';
 import Loading from '@/components/Loading';
 import keycloakClient from '@/keycloak';
 import homeSvg from '@/assets/images/home.svg';
-import { Link, useDispatch, useSelector, ICommonState, CommonActions } from 'umi';
+import { ICommonState, CommonActions } from 'umi';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, BrowserRouter as Router } from 'react-router-dom';
+
+// 添加cnzz数据统计分析 --- start
+if (!(window as any).addCnzzOnce) {
+  // console.log('window.addCnzzOnce: ', (window as any).addCnzzOnce ); // 只执行一次
+  var a = setTimeout(addCnzzfx, 500);
+  function addCnzzfx() {
+    (function () {
+      var el = document.createElement('script');
+      el.type = 'text/javascript';
+      el.charset = 'utf-8';
+      el.async = true;
+      var ref: HTMLScriptElement = document.getElementsByTagName('script')[0];
+      (ref.parentNode as Node & ParentNode).insertBefore(el, ref);
+      el.src = 'https://w.cnzz.com/c.php?id=1280088195&async=1';
+      const startTime = Date.now();
+      el.onload = function () {
+        const loadedTime = Date.now();
+        const deltaTime = loadedTime - startTime;
+        console.log('script loaded time:', deltaTime, 'ms');
+        console.log('script dom:', this);
+      };
+    })();
+  }
+
+  (window as any).addCnzzOnce = true; //
+}
+// 添加cnzz数据统计分析 --- end
 
 interface Props {
   dispatch: (a: IAction) => IAction;
@@ -23,7 +52,7 @@ interface Props {
 
 const BasicLayout: React.FC<Props> = (props) => {
   const dispatch = useDispatch();
-  const { loading }: ICommonState = useSelector((state: any) => state.common);
+  const { loading, isMobile }: ICommonState = useSelector((state: any) => state.common);
   const [hasLogin, setHasLogin] = useState(false);
 
   useEffect(() => {
@@ -41,7 +70,14 @@ const BasicLayout: React.FC<Props> = (props) => {
       payload: { isMobile },
     });
     if (isMobile) {
-      document.body.style.zoom = window.innerWidth / (1200 + 36) + '';
+      const scaleRate = window.innerWidth / (1200 + 36);
+      document.body.style.transform = `scale(${scaleRate})`;
+      (document.body.style as any)['transform-origin'] = 'left top';
+      const rootDiv = document.getElementById('root');
+      if (rootDiv) {
+        rootDiv.style.height = `calc(100% * ${1 / scaleRate})`;
+        rootDiv.style.width = `calc(100% * ${1 / scaleRate})`;
+      }
     }
   }, []);
   useEffect(() => {
@@ -68,19 +104,19 @@ const BasicLayout: React.FC<Props> = (props) => {
 
   return (
     <ConfigProvider locale={zhCN}>
-      <div className={styles.normal}>
+      <div className={isMobile ? 'normal mobile' : 'normal'}>
         {loading ? (
           <Loading />
         ) : (
-          <div className={styles.layoutContainer}>
-            <div className={styles.layoutSide}>
+          <div className="layoutContainer">
+            <div className="layoutSide">
               <Link to="/home">
-                <img src={homeSvg} className={styles.layoutHome} alt="home"></img>
+                <img src={homeSvg} className="layoutHome" alt="home"></img>
               </Link>
             </div>
-            <div className={styles.layoutMain}>
+            <div className="layoutMain">
               <GlobalHeader />
-              <div>{props.children}</div>
+              <div className="layoutNoHeader">{props.children}</div>
             </div>
           </div>
         )}

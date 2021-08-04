@@ -2,13 +2,13 @@ package handler
 
 import (
 	"code.cloudfoundry.org/bytefmt"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
+	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
-	"github.com/pkg/errors"
 	"math"
 	"net/http"
 	"path/filepath"
@@ -288,6 +288,7 @@ func (handler *Handler) GetPublicImages(ctx echo.Context, params apigen.GetPubli
 				imageTags = append(imageTags, apigen.ImageTag(tag.Name))
 			}
 			imageSize := bytefmt.ByteSize(uint64(atf.Size))
+			imageDigest := atf.Digest
 			importingTime, err := time.Parse(time.RFC3339, atf.PushTime.String())
 			if err != nil {
 				return echo.NewHTTPError(
@@ -298,6 +299,7 @@ func (handler *Handler) GetPublicImages(ctx echo.Context, params apigen.GetPubli
 				Tags:          &imageTags,
 				Repo:          &imageRepo,
 				Size:          &imageSize,
+				Digest:        &imageDigest,
 				ImportingTime: &importingTime,
 			}
 			imagesList = append(imagesList, artifactInfo)
@@ -383,6 +385,7 @@ func (handler *Handler) GetImages(ctx echo.Context, params apigen.GetImagesParam
 			}
 			imageSize := bytefmt.ByteSize(uint64(atf.Size))
 			importingTime, err := time.Parse(time.RFC3339, atf.PushTime.String())
+			imageDigest := atf.Digest
 			if err != nil {
 				return echo.NewHTTPError(
 					http.StatusInternalServerError, "Get images failed.").SetInternal(
@@ -392,6 +395,7 @@ func (handler *Handler) GetImages(ctx echo.Context, params apigen.GetImagesParam
 				Tags:          &imageTags,
 				Repo:          &imageRepo,
 				Size:          &imageSize,
+				Digest:        &imageDigest,
 				ImportingTime: &importingTime,
 			}
 			imagesList = append(imagesList, artifactInfo)
@@ -419,8 +423,8 @@ func (handler *Handler) DeleteImages(ctx echo.Context, params apigen.DeleteImage
 	host, basepath, schemes := conf.GetHarborAddress()
 	client := utils.GetHarborClient(host, basepath, schemes)
 	repoName := string(params.Repo)
-	tag := string(params.Tag)
-	err := utils.DeleteArtifact(client, userID, repoName, tag)
+	reference := params.Reference
+	err := utils.DeleteArtifact(client, userID, repoName, reference)
 	if err != nil {
 		ctx.Logger().Error(err.Error())
 		if strings.Contains(err.Error(), "deleteArtifactNotFound") {

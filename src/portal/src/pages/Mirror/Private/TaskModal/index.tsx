@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Modal, CessBaseTable, Button } from 'cess-ui';
 import { ColumnProps } from 'antd/lib/table';
-import { useDispatch, useSelector } from 'umi';
+import { useDispatch, useSelector } from 'react-redux';
 import { PrivateImageAction } from '../../models/private-image';
 import moment from 'moment';
 import { Task } from '@/constant/task';
@@ -43,21 +43,25 @@ function TaskModal() {
         title: '仓库名',
         dataIndex: 'repo',
         key: 'repo',
+        width: '130px',
       },
       {
         title: 'Tag',
         dataIndex: 'tag',
         key: 'tag',
+        width: '130px',
       },
       {
         title: '状态',
         dataIndex: 'status',
         key: 'status',
+        width: '130px',
       },
       {
         title: '创建时间',
         dataIndex: 'start_time',
         key: 'start_time',
+        width: '130px',
         render: (value: any) => {
           return moment(new Date(value)).format('yyyy-MM-DD HH:mm:ss');
         },
@@ -66,6 +70,7 @@ function TaskModal() {
         title: '结束时间',
         dataIndex: 'end_time',
         key: 'end_time',
+        width: '130px',
         render: (value: any, record: any) => {
           return record.status === Task.Pending ||
             record.status === Task.InProgress ||
@@ -79,6 +84,7 @@ function TaskModal() {
         title: 'Registry',
         dataIndex: 'registry',
         key: 'registry',
+        width: '130px',
         render: (value: any) => {
           return value.url;
         },

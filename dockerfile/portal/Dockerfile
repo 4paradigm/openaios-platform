@@ -1,4 +1,4 @@
-FROM node AS build
+FROM node:12.16.3 AS build
 COPY ./src/portal /
 RUN npm install
 RUN npm run build

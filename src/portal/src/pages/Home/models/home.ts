@@ -20,13 +20,13 @@ export const HomeAction = {
 export interface IHomeState {
   userInfo: any;
   taskInfo: any;
-  msgInfo: IMessage[];
+  msgInfo: any;
 }
 
 const defaultState: IHomeState = {
   userInfo: null,
   taskInfo: null,
-  msgInfo: [],
+  msgInfo: null,
 };
 
 const home: Model = {
@@ -85,8 +85,8 @@ const home: Model = {
       const { data }: any = yield call(
         CompetitionApiApiInstance.competitionGet.bind(CompetitionApiApiInstance),
       );
+      const messageList: any[] = [];
       if (data) {
-        const messageList: any[] = [];
         data.forEach((element: IMessage) => {
           if (element.id) {
             element.title = `【比赛】${element.name}`;

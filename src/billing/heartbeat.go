@@ -2,13 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/labstack/gommon/log"
+	"github.com/pkg/errors"
+	"github.com/robfig/cron/v3"
 	"github.com/4paradigm/openaios-platform/src/billing/conf"
 	"github.com/4paradigm/openaios-platform/src/billing/utils"
 	"github.com/4paradigm/openaios-platform/src/internal/mongodb"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
-	"github.com/labstack/gommon/log"
-	"github.com/pkg/errors"
-	"github.com/robfig/cron/v3"
 	"time"
 )
 
@@ -30,7 +30,7 @@ func run() {
 	}
 
 	// get user pod list in k8s
-	podList, err := utils.GetPodList(kubeClient, "belongTo=user", "")
+	podList, err := utils.GetPodList(kubeClient, "openaios.4paradigm.com/app=true", "")
 	if err != nil {
 		log.Error(err.Error())
 		return

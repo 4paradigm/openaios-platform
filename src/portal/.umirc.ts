@@ -2,7 +2,7 @@
  * @Author: liyuying
  * @Date: 2021-04-23 11:55:28
  * @LastEditors: liyuying
- * @LastEditTime: 2021-06-11 14:16:03
+ * @LastEditTime: 2021-06-22 17:02:33
  * @Description: file content
  */
 import { defineConfig } from 'umi';
@@ -15,7 +15,7 @@ export default defineConfig({
   title: 'AIOS 社区版',
   links: [
     // href的图片你可以放在public里面，直接./图片名.png 就可以了
-    { rel: 'icon', href: './favicon.png' },
+    { rel: 'icon', href: '/favicon.png' },
   ],
   routes: routes,
   dynamicImport: {

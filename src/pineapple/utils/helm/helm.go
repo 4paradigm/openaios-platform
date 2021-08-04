@@ -51,6 +51,16 @@ func (h *HelmClientImpl) Create(chart *chart.Chart, info IPineappleInfo) (*relea
 	client := action.NewInstall(h.ActionConfig)
 	client.Namespace = info.GetUserId()
 	client.ReleaseName = info.GetPrefix() + info.GetName()
+	postRenderer := NewPostRendererImpl()
+	postRenderer.WriteKustomzation(".", `
+commonLabels:
+  app.kubernetes.io/managed-by: Helm
+  app.kubernetes.io/instance: `+client.ReleaseName+`
+  openaios.4paradigm.com/app: "true"
+resources:
+- all.yaml
+`)
+	client.PostRenderer = postRenderer
 	results, err := client.Run(chart, chartValues)
 	// TODO(fuhao): Graceful handling this error
 	if err != nil {

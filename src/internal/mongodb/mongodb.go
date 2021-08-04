@@ -2,9 +2,9 @@ package mongodb
 
 import (
 	"context"
-	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/labstack/gommon/log"
 	"github.com/pkg/errors"
+	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -96,6 +96,26 @@ func CreateUniqueIndex(client *mongo.Client, database string, collection string,
 		return errors.New("EnsureIndex error")
 	}
 	return nil
+}
+
+func CountDocuments(client *mongo.Client, database string, collection string,
+	key string, operators ...ComparisonQueryOperator) (int64, error) {
+	if client == nil {
+		return 0, errors.New("mongodb client is nil.")
+	}
+	db := client.Database(database).Collection(collection)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	operatorList := bson.M{}
+	for _, operator := range operators {
+		operatorList[operator.Operation] = operator.Value
+	}
+	if key != "" {
+		return db.CountDocuments(ctx, bson.M{key: operatorList})
+	} else {
+		return db.CountDocuments(ctx, bson.D{})
+	}
 }
 
 func InsertOneDocument(client *mongo.Client, database string, collection string,

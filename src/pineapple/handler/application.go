@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/controller/application"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"net/http"
 	"regexp"
 	"strings"
@@ -130,13 +130,6 @@ func (handler *Handler) GetApplicationMetadata(ctx echo.Context, name string) er
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
-	//response, err := parseApplicationInstanceInfoToResponse(appInstanceInfo)
-	//if err != nil {
-	//	return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
-	//}
-	if appInstanceInfo == nil {
-		return response.BadRequestWithMessagef(ctx, "应用%s不存在", name)
-	}
 	return ctx.JSON(http.StatusOK, appInstanceInfo)
 }
 
@@ -178,9 +171,6 @@ func (handler *Handler) GetApplicationNotes(ctx echo.Context, name string) error
 	notes, err := appImpl.GetApplicationReleaseNotes(name)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
-	}
-	if notes == nil {
-		return response.BadRequestWithMessagef(ctx, "应用%s不存在", name)
 	}
 	return ctx.JSON(http.StatusOK, notes)
 }

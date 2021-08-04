@@ -2,12 +2,12 @@
  * @Author: liyuying
  * @Date: 2021-04-23 11:55:28
  * @LastEditors: liyuying
- * @LastEditTime: 2021-06-21 17:07:37
+ * @LastEditTime: 2021-06-22 15:23:32
  * @Description: file content
  */
 import React, { useMemo, useEffect, useRef } from 'react';
 import { CessCard, Breadcrumb, Empty, Tooltip, Carousel, OverflowToolTip, Icon } from 'cess-ui';
-import { Link, history } from 'umi';
+import { Link, history, ICommonState } from 'umi';
 import { useDispatch, useSelector } from 'react-redux';
 import { HomeAction, IHomeState } from './models/home';
 // import BalanceIcon from '@/assets/images/balance.svg';
@@ -19,9 +19,11 @@ import ResourceChart from './ResourceChart';
 import { IMessage, IBanner } from '@/interfaces/bussiness';
 import { BANNER_LSIT } from './data/banner/banner';
 import { INDEX_MESSAGE, APPLICATION, DEV_ENVIRONMENT, APPLICATION_INSTANCE } from '@/router/url';
+import { LoadingOutlined } from '@ant-design/icons';
 
 const Home = () => {
   const dispatch = useDispatch();
+  const { isMobile }: ICommonState = useSelector((state: any) => state.common);
   const { taskInfo, msgInfo, userInfo }: IHomeState = useSelector((state: any) => state.home);
   const breadCrumb = useMemo(() => {
     return (
@@ -72,8 +74,9 @@ const Home = () => {
           <CessCard>
             <h3 className="card-title">活动与赛事</h3>
             <div className="home-msg-container">
-              {msgInfo && msgInfo.length > 0
-                ? msgInfo.map((msg) => {
+              {Array.isArray(msgInfo) ? (
+                msgInfo.length > 0 ? (
+                  msgInfo.map((msg: IMessage) => {
                     return (
                       <p
                         className="home-msg-item"
@@ -86,7 +89,12 @@ const Home = () => {
                       </p>
                     );
                   })
-                : '暂无公告'}
+                ) : (
+                  '暂无公告'
+                )
+              ) : (
+                <LoadingOutlined />
+              )}
             </div>
           </CessCard>
           <CessCard>
@@ -136,17 +144,21 @@ const Home = () => {
               </div>
             </div>
           </CessCard>
-          <CessCard>
-            <h3 className="card-title">我的实例信息</h3>
-            <p>
-              共 {(taskInfo && taskInfo.env_num) || 0} 个开发环境实例
-              <Link to={DEV_ENVIRONMENT}> &gt;&gt;查看更多</Link>
-            </p>
-            <p>
-              共 {(taskInfo && taskInfo.app_num) || 0} 个应用实例
-              <Link to={APPLICATION_INSTANCE}> &gt;&gt;查看更多</Link>
-            </p>
-          </CessCard>
+          {isMobile ? (
+            ''
+          ) : (
+            <CessCard>
+              <h3 className="card-title">我的实例信息</h3>
+              <p className="env">
+                共 {(taskInfo && taskInfo.env_num) || 0} 个开发环境实例
+                <Link to={DEV_ENVIRONMENT}> &gt;&gt;查看更多</Link>
+              </p>
+              <p className="app">
+                共 {(taskInfo && taskInfo.app_num) || 0} 个应用实例
+                <Link to={APPLICATION_INSTANCE}> &gt;&gt;查看更多</Link>
+              </p>
+            </CessCard>
+          )}
         </div>
       </div>
     </div>

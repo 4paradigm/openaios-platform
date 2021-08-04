@@ -2,7 +2,7 @@
  * @Author: liyuying
  * @Date: 2021-06-20 12:56:30
  * @LastEditors: liyuying
- * @LastEditTime: 2021-06-20 16:03:06
+ * @LastEditTime: 2021-06-22 16:01:51
  * @Description: file content
  */
 import React from 'react';
@@ -46,7 +46,7 @@ const ApplicationInstanceDetailNotes = ({ instance_name }: Iprop) => {
   return (
     <div className="application-instance-detail-notes">
       {notes ? (
-        <Input.TextArea value={notes || ''} readOnly rows={8}></Input.TextArea>
+        <Input.TextArea value={notes || ''} readOnly autoSize={true}></Input.TextArea>
       ) : (
         <div className="empty-container">
           <Empty msg="当前实例无 Notes"></Empty>

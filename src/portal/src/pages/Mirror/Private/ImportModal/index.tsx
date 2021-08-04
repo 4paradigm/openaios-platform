@@ -7,7 +7,7 @@
  */
 import React, { useRef } from 'react';
 import { Modal, Form, Input, Select } from 'cess-ui';
-import { useDispatch, useSelector } from 'umi';
+import { useDispatch, useSelector } from 'react-redux';
 import { PrivateImageAction } from '../../models/private-image';
 const { Option } = Select;
 
@@ -55,9 +55,13 @@ function ImportModal() {
           rules={[{ required: true, message: '请选择registry' }]}
           name="registryId"
         >
-          <Select style={{ width: '433px' }} placeholder="请选择registry">
+          <Select
+            className="select_registry"
+            style={{ width: '433px' }}
+            placeholder="请选择registry"
+          >
             {registryList.map((registry: any) => (
-              <Option key={registry.id} value={registry.id}>
+              <Option className="registry_list" key={registry.id} value={registry.id}>
                 {registry.url}
               </Option>
             ))}

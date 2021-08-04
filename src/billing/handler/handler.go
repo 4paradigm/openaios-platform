@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"github.com/labstack/gommon/log"
 	"github.com/4paradigm/openaios-platform/src/billing/conf"
 	"github.com/4paradigm/openaios-platform/src/billing/utils"
 	"github.com/4paradigm/openaios-platform/src/internal/mongodb"
-	"github.com/labstack/gommon/log"
 )
 
 type Handler struct{}

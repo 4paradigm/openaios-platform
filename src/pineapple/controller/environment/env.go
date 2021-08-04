@@ -4,16 +4,21 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"fmt"
+	"github.com/pkg/errors"
+	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
-	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/duration"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -78,9 +83,11 @@ func (e *EnvironmentImpl) GetInfoList(limit int, offset int) (*EnvironmentReleas
 			}
 			envReleaseInfos[i].State = &state
 			envReleaseInfos[i].PodName = ""
+			envReleaseInfos[i].Events = nil
 		} else {
 			envReleaseInfos[i].State = envPodInfos[*releaseName].State
 			envReleaseInfos[i].PodName = *envPodInfos[*releaseName].PodName
+			envReleaseInfos[i].Events = envPodInfos[*releaseName].Events
 		}
 		envReleaseInfos[i].SshInfo = envSshInfos[*releaseName]
 		envReleaseInfos[i].ReleaseName = *releaseName
@@ -118,10 +125,20 @@ func (e *EnvironmentImpl) GetInfo(name string) (*EnvironmentReleaseInfo, error) 
 	if len(*pods) == 0 {
 		envReleaseInfo.PodName = ""
 		*envReleaseInfo.State = EnvironmentState_Killed
+		envReleaseInfo.Events = nil
 	} else {
 		envReleaseInfo.PodName = (*pods)[0].Name
 		state := EnvironmentState((*pods)[0].Status.Phase)
 		envReleaseInfo.State = &state
+		events, err := e.GetSpecifyInvolvedObjectEventList((*pods)[0].Name)
+		if err != nil {
+			return nil, errors.WithMessage(err, "GetSpecifyInvolvedObjectEventList error: ")
+		}
+		var eventInfos = []apigen.ApplicationInstanceEvent{}
+		for _, e := range *events {
+			eventInfos = append(eventInfos, parseEventToEventInfo(&e))
+		}
+		envReleaseInfo.Events = &eventInfos
 	}
 
 	envReleaseInfo.SshInfo, err = e.getSshInfo(releaseName)
@@ -209,10 +226,12 @@ func (e *EnvironmentImpl) getPodInfoList(envRuntimeStaticInfos []*EnvironmentRun
 		return nil, errors.WithMessage(err, "GetKubernetesClient error: ")
 	}
 	labelSelector := "app.kubernetes.io/instance in ("
-	for _, e := range envRuntimeStaticInfos {
-		labelSelector += *e.Name + ","
+	for _, eI := range envRuntimeStaticInfos {
+		labelSelector += *eI.Name + ","
 	}
-	labelSelector += ")"
+	labelSelector += "),"
+	labelSelector += "openaios.4paradigm.com/app in (true)"
+
 	podList, err := utils.GetPodList(client, labelSelector, *e.Config.Namespace)
 	if err != nil {
 		return nil, errors.WithMessage(err, "Get pod list error: ")
@@ -223,10 +242,62 @@ func (e *EnvironmentImpl) getPodInfoList(envRuntimeStaticInfos []*EnvironmentRun
 		envPodInfos[pod.Labels["name"]] = new(EnvironmentPodInfo)
 		state := EnvironmentState(pod.Status.Phase)
 		name := pod.Name
+		events, err := e.GetSpecifyInvolvedObjectEventList(pod.Name)
+		if err != nil {
+			return nil, errors.WithMessage(err, "GetSpecifyInvolvedObjectEventList error: ")
+		}
+		var eventInfos = []apigen.ApplicationInstanceEvent{}
+		for _, e := range *events {
+			eventInfos = append(eventInfos, parseEventToEventInfo(&e))
+		}
 		envPodInfos[pod.Labels["name"]].PodName = &name
 		envPodInfos[pod.Labels["name"]].State = &state
+		envPodInfos[pod.Labels["name"]].Events = &eventInfos
 	}
 	return envPodInfos, nil
+}
+
+func parseEventToEventInfo(e *v1.Event) apigen.ApplicationInstanceEvent {
+	// Age
+	var interval string
+	if e.Count > 1 {
+		interval = fmt.Sprintf("%s (x%d over %s)", translateTimestampSince(e.LastTimestamp), e.Count, translateTimestampSince(e.FirstTimestamp))
+	} else {
+		interval = translateTimestampSince(e.FirstTimestamp)
+		if e.FirstTimestamp.IsZero() {
+			interval = translateMicroTimestampSince(e.EventTime)
+		}
+	}
+	// From
+	source := e.Source.Component
+	if source == "" {
+		source = e.ReportingController
+	}
+	message := strings.TrimSpace(e.Message)
+	eventInfo := apigen.ApplicationInstanceEvent{
+		Age:     &interval,
+		From:    &source,
+		Message: &message,
+		Reason:  &e.Reason,
+		Type:    &e.Type,
+	}
+	return eventInfo
+}
+
+func translateMicroTimestampSince(timestamp metav1.MicroTime) string {
+	if timestamp.IsZero() {
+		return "<unknown>"
+	}
+
+	return duration.HumanDuration(time.Since(timestamp.Time))
+}
+
+func translateTimestampSince(timestamp metav1.Time) string {
+	if timestamp.IsZero() {
+		return "<unknown>"
+	}
+
+	return duration.HumanDuration(time.Since(timestamp.Time))
 }
 
 func (e *EnvironmentImpl) getSshInfoList() (map[string]*EnvironmentRuntimeSshInfo, error) {

@@ -11,6 +11,9 @@ import juperterIcon from '@/assets/images/jupter.png';
 import sshIcon from '@/assets/images/ssh.png';
 import webTerminalIcon from '@/assets/images/web-terminal.png';
 import { ENVIRONMENT_STATUS, ENVIRONMENT_STATUS_TAG } from '@/constant/environment';
+import { EnvironmentRuntimeInfo } from '@/openApi/api';
+import DevEnvironmentEvents from './Events';
+import ApplicationChartQuestionConfig from '../Application/Chart/Create/components/QestionConfig';
 
 const { Step } = Steps;
 
@@ -21,16 +24,9 @@ const breadcrumbList = [
 ];
 const DevEnvironment = () => {
   const dispatch = useDispatch();
-  const { dataSource, total, currentPage }: IEnvironmentListState = useSelector(
+  const { dataSource, total, currentPage, eventVisible }: IEnvironmentListState = useSelector(
     (state: any) => state.environmentList,
   );
-
-  useEffect(() => {
-    dispatch({
-      type: EnvironmentListAction.GET_LIST,
-      payload: currentPage,
-    });
-  }, []);
   const pageChange = (currentPage: number, pageSize: number) => {
     dispatch({
       type: EnvironmentListAction.GET_LIST,
@@ -55,14 +51,40 @@ const DevEnvironment = () => {
       },
     });
   };
-
+  /**
+   * 查看events
+   * @param env
+   */
+  const viewEnvironmentEvents = (env: EnvironmentRuntimeInfo) => {
+    dispatch({
+      type: EnvironmentListAction.UPDATE_STATUS,
+      payload: {
+        eventVisible: true,
+        eventList: env.events || [],
+      },
+    });
+  };
   const openWebTerminal = (pod: string) => {
     dispatch({
       type: EnvironmentListAction.OPEN_TERMINAL,
       payload: pod,
     });
   };
-
+  useEffect(() => {
+    dispatch({
+      type: EnvironmentListAction.GET_LIST,
+      payload: currentPage,
+    });
+    return () => {
+      dispatch({
+        type: EnvironmentListAction.UPDATE_STATUS,
+        payload: {
+          eventVisible: false,
+          eventList: [],
+        },
+      });
+    };
+  }, []);
   const actions = useMemo(() => {
     return [
       <Tooltip
@@ -98,6 +120,7 @@ const DevEnvironment = () => {
         title: '名称',
         dataIndex: 'name',
         key: 'name',
+        width: 104,
         render: (value, record: any) => {
           return record.staticInfo.name;
         },
@@ -106,6 +129,7 @@ const DevEnvironment = () => {
         title: '状态',
         dataIndex: 'state',
         key: 'state',
+        width: 104,
         render: (value, record: any) => {
           return (
             <>
@@ -184,6 +208,7 @@ const DevEnvironment = () => {
         title: '算力规格',
         dataIndex: 'compute_unit',
         key: 'compute_unit',
+        width: 161,
         render: (value, record: any) => {
           return record.staticInfo.environmentConfig.compute_unit;
         },
@@ -192,6 +217,7 @@ const DevEnvironment = () => {
         title: '创建时间',
         dataIndex: 'create_tm',
         key: 'create_tm',
+        width: 216,
         render: (value, record: any) => {
           return moment(new Date(record.staticInfo.create_tm)).format('yyyy-MM-DD HH:mm:ss');
         },
@@ -200,19 +226,31 @@ const DevEnvironment = () => {
         title: '操作',
         dataIndex: 'operate',
         key: 'operate',
-        width: '80px',
+        width: '200px',
         render: (value, record, index: number) => {
           return (
-            <Button
-              type="link"
-              icon={<Icon type="delete" />}
-              onClick={(e) => {
-                e.stopPropagation();
-                delteEnvironment(record.staticInfo.name);
-              }}
-            >
-              删除
-            </Button>
+            <>
+              <Button
+                type="link"
+                icon={<Icon type="list-detail" />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  viewEnvironmentEvents(record);
+                }}
+              >
+                Events
+              </Button>
+              <Button
+                type="link"
+                icon={<Icon type="list-delete" />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  delteEnvironment(record.staticInfo.name);
+                }}
+              >
+                删除
+              </Button>
+            </>
           );
         },
       },
@@ -248,6 +286,7 @@ const DevEnvironment = () => {
         actions={actions}
         breadcrumbList={breadcrumbList}
       />
+      <DevEnvironmentEvents></DevEnvironmentEvents>
     </div>
   );
 };

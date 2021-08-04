@@ -8,6 +8,9 @@ data:
   entrypoint.sh: |
     if [ ${USE_SSH} = "True" ]; then
       mkdir /run/sshd
+      if [ ! -f /etc/ssh/ssh_host_rsa_key ] || [ ! -f /etc/ssh/ssh_host_ecdsa_key ] || [ ! -f /etc/ssh/ssh_host_ed25519_key ]; then
+        ssh-keygen -A
+      fi
       CAT_PATH=$(which cat)
       /usr/sbin/sshd \
       -o "AuthorizedKeysCommand ${CAT_PATH} /pineapple/secret/ssh/ssh-key" \
@@ -22,7 +25,11 @@ data:
       --ip="0.0.0.0" \
       --port=8888 \
       --allow-root \
-      --LabApp.token="{{ .Values.jupyter.token }}" \
+      {{- if .Values.jupyter.token }}
+      --LabApp.token={{ .Values.jupyter.token | quote }} \
+      {{- else }}
+      --LabApp.token='' \
+      {{- end }}
       --LabApp.password='' \
       --LabApp.base_url="/ingress/{{ .Release.Namespace }}/env/{{ .Release.Name }}/jupyterlab"
     elif [ ${USE_JUPYTER} = "False" ]; then

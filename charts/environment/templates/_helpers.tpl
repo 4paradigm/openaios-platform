@@ -36,7 +36,6 @@ Common labels
 {{- define "environment.labels" -}}
 helm.sh/chart: {{ include "environment.chart" . }}
 {{ include "environment.selectorLabels" . }}
-belongTo: {{ .Values.pineapple.belongTo }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -50,5 +49,4 @@ Selector labels
 appName: {{ .Chart.Name }}
 name: {{ .Release.Name }}
 app.kubernetes.io/name: {{ include "environment.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}

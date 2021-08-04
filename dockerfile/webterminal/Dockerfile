@@ -24,14 +24,21 @@ RUN cd src && CGO_ENABLED=0 go build -v -o /bin/web-terminal ./webterminal/serve
 RUN cd src && CGO_ENABLED=0 go build -v -o /bin/gotty ./webterminal/gotty
 
 
-FROM ubuntu:18.04
+FROM docker.4pd.io/adc/infras/kubectl:latest
 USER root
-RUN apt-get update \
-    && apt-get install -y apt-transport-https ca-certificates curl \
-    && curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list \
-    && apt-get update
-    && apt-get install -y kubectl
+#RUN apt-get --allow-unauthenticated update \
+#    && apt-get --allow-unauthenticated install -y wget \
+#    && apt-get --allow-unauthenticated update && apt-get --allow-unauthenticated install -y apt-transport-https gnupg2 curl \
+#    && curl -k -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
+#    && echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list \
+#    && apt-get --allow-unauthenticated update \
+#    && apt-get --allow-unauthenticated install -y kubectl
+#RUN apt-get update && apt-get install -y apt-transport-https gnupg2 curl wget
+#RUN wget -q -O apt-key.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg && apt-key add apt-key.gpg
+#RUN echo "deb https://apt.kuberqnetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+#RUN apt-get update
+#RUN sudo apt-get install -y kubectl
+
 
 WORKDIR /root
 

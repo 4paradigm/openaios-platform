@@ -3,10 +3,10 @@ package billingclient
 import (
 	"context"
 	"encoding/json"
-	"github.com/4paradigm/openaios-platform/src/internal/billingclient/apigen"
-	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/labstack/gommon/log"
 	"github.com/pkg/errors"
+	"github.com/4paradigm/openaios-platform/src/internal/billingclient/apigen"
+	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"io/ioutil"
 	"net/http"
 	"strconv"

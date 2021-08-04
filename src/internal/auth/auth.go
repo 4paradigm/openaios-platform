@@ -10,7 +10,7 @@ import (
 
 var (
 	keycloakUrl = flag.String("keycloak-url", os.Getenv("PINEAPPLE_OIDC_KEYCLOAK_URL"),
-		"oidc keycloak url like")
+		"oidc keycloak url like https://keycloak.pineapple.com:32443/auth/realms/develop")
 	clientID = flag.String("oidc-client-id", os.Getenv("PINEAPPLE_OIDC_CLIENT_ID"),
 		"oidc client id")
 	verifier *oidc.IDTokenVerifier = nil

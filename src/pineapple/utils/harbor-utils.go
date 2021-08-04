@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/AimAlex/harbor-client/harborcli"
 	"github.com/AimAlex/harbor-client/harborcli/artifact"
 	"github.com/AimAlex/harbor-client/harborcli/chart_repository"
@@ -14,6 +13,7 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	"github.com/pkg/errors"
+	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"math/rand"
 	"strings"
 	"time"
@@ -29,6 +29,7 @@ func getHarborAdminAuth() runtime.ClientAuthInfoWriter {
 	return httptransport.BasicAuth(username, passwd)
 }
 
+// 创建harbor用户
 func CreateHarborUser(client *harborcli.HarborAPI, userID string, passwd string, realName string, email string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -45,6 +46,7 @@ func CreateHarborUser(client *harborcli.HarborAPI, userID string, passwd string,
 	return nil
 }
 
+// 判断harbor用户是否被创建
 func CheckHarborUserExist(client *harborcli.HarborAPI, userID string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -62,6 +64,7 @@ func CheckHarborUserExist(client *harborcli.HarborAPI, userID string) (bool, err
 	}
 }
 
+// 创建用户自己的project
 func CreateHarborProject(client *harborcli.HarborAPI, name string, isPublic string, limit *int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -76,6 +79,7 @@ func CreateHarborProject(client *harborcli.HarborAPI, name string, isPublic stri
 	return nil
 }
 
+// 在project中给用户设置权限
 func AddUserToProject(client *harborcli.HarborAPI, userID string, projectID int32, role int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -89,6 +93,7 @@ func AddUserToProject(client *harborcli.HarborAPI, userID string, projectID int3
 	return nil
 }
 
+// 判断用户是否是project的member
 func CheckProjectMemberExist(client *harborcli.HarborAPI, userID string, projectID int64) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -105,6 +110,7 @@ func CheckProjectMemberExist(client *harborcli.HarborAPI, userID string, project
 	}
 }
 
+// 通过project的名字获得ID
 func GetProjectIDByName(client *harborcli.HarborAPI, projectName string) (int32, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -122,6 +128,7 @@ func GetProjectIDByName(client *harborcli.HarborAPI, projectName string) (int32,
 	return 0, errors.New("Cannot get user project " + GetRuntimeLocation())
 }
 
+// 获取所有的replication policy
 func GetReplicationPolicies(client *harborcli.HarborAPI) ([]*models.ReplicationPolicy, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -134,6 +141,7 @@ func GetReplicationPolicies(client *harborcli.HarborAPI) ([]*models.ReplicationP
 	return resp.Payload, nil
 }
 
+// 获取指定的replication policy的execution
 func GetPolicyExecution(client *harborcli.HarborAPI, policyID int64) (*models.ReplicationExecution, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -149,6 +157,7 @@ func GetPolicyExecution(client *harborcli.HarborAPI, policyID int64) (*models.Re
 	return resp.Payload[0], nil
 }
 
+// 创建replication policy
 func CreateReplicationPolicy(client *harborcli.HarborAPI, namespace string, repo string, tag string,
 	name string, registryID int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -178,6 +187,7 @@ func CreateReplicationPolicy(client *harborcli.HarborAPI, namespace string, repo
 	return nil
 }
 
+// 通过policy的名字获取policy ID
 func GetReplicationPolicyIDByName(client *harborcli.HarborAPI, policyName string) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -193,6 +203,7 @@ func GetReplicationPolicyIDByName(client *harborcli.HarborAPI, policyName string
 	}
 }
 
+// 执行指定的replication policy
 func RunReplicationExecution(client *harborcli.HarborAPI, policyID int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -206,6 +217,7 @@ func RunReplicationExecution(client *harborcli.HarborAPI, policyID int64) error 
 	return nil
 }
 
+// 通过ID获取指定的replication policy
 func GetReplicationPolicyByID(client *harborcli.HarborAPI, policyID int64) (*models.ReplicationPolicy, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -218,6 +230,7 @@ func GetReplicationPolicyByID(client *harborcli.HarborAPI, policyID int64) (*mod
 	return resp.Payload, nil
 }
 
+// 删除指定的replication policy
 func DeleteReplicationPolicy(client *harborcli.HarborAPI, policyID int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -230,6 +243,7 @@ func DeleteReplicationPolicy(client *harborcli.HarborAPI, policyID int64) error 
 	return nil
 }
 
+// 获取指定的replication policy的execution
 func GetReplicationExecution(client *harborcli.HarborAPI, policyID int64) (*models.ReplicationExecution, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -242,6 +256,7 @@ func GetReplicationExecution(client *harborcli.HarborAPI, policyID int64) (*mode
 	return resp.Payload[0], nil
 }
 
+// 停止指定policy的execution
 func StopReplicationExecution(client *harborcli.HarborAPI, executionID int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -254,6 +269,7 @@ func StopReplicationExecution(client *harborcli.HarborAPI, executionID int64) er
 	return nil
 }
 
+// 获取所有的
 func GetRegistries(client *harborcli.HarborAPI) ([]*models.Registry, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -266,6 +282,7 @@ func GetRegistries(client *harborcli.HarborAPI) ([]*models.Registry, error) {
 	return resp.Payload, nil
 }
 
+// 获取project下的所有repo
 func GetProjectRepositories(client *harborcli.HarborAPI, projectName string, filter *string) ([]*models.Repository, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -279,6 +296,7 @@ func GetProjectRepositories(client *harborcli.HarborAPI, projectName string, fil
 	return resp.Payload, nil
 }
 
+// 获取repo下面所有的artifacts
 func GetProjectRepositoryArtifacts(client *harborcli.HarborAPI, projectName string, repoName string) ([]*models.Artifact, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -294,6 +312,7 @@ func GetProjectRepositoryArtifacts(client *harborcli.HarborAPI, projectName stri
 	return resp.Payload, nil
 }
 
+// copy artifact 到其他repo
 func CopyArtifact(client *harborcli.HarborAPI, projectName string, destRepo string, src string) error {
 	params := artifact.CopyArtifactParams{ProjectName: projectName, RepositoryName: destRepo,
 		From: src, Context: context.Background()}
@@ -304,12 +323,13 @@ func CopyArtifact(client *harborcli.HarborAPI, projectName string, destRepo stri
 	return nil
 }
 
-func DeleteArtifact(client *harborcli.HarborAPI, projectName string, repo string, tag string) error {
+// 删除artifact
+func DeleteArtifact(client *harborcli.HarborAPI, projectName string, repo string, reference string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	params := artifact.DeleteArtifactParams{Context: ctx, ProjectName: projectName,
-		RepositoryName: repo, Reference: tag}
+		RepositoryName: repo, Reference: reference}
 	_, err := client.Artifact.DeleteArtifact(&params, getHarborAdminAuth())
 	if err != nil {
 		return errors.Wrap(err, "cannot delete image. "+GetRuntimeLocation())
@@ -317,6 +337,7 @@ func DeleteArtifact(client *harborcli.HarborAPI, projectName string, repo string
 	return nil
 }
 
+// 获取project下的所有repo
 func GetRepository(client *harborcli.HarborAPI, projectName string, repo string) (*models.Repository, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -329,6 +350,7 @@ func GetRepository(client *harborcli.HarborAPI, projectName string, repo string)
 	return resp.Payload, nil
 }
 
+// 删除project下的repo
 func DeleteRepository(client *harborcli.HarborAPI, projectName string, repo string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

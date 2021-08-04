@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Radio, OverflowToolTip, Icon } from 'cess-ui';
-import { useSelector, useDispatch, IComputeUnitRadioState, ComputeUnitRadioAction } from 'umi';
+import { IComputeUnitRadioState, ComputeUnitRadioAction } from 'umi';
+import { useSelector, useDispatch } from 'react-redux';
 import './index.less';
 
 /*

@@ -157,11 +157,11 @@ export function transferObjectFromFlatToLevles(flatObject: any) {
   if (keys && keys.length > 0 && keys[0] !== '0') {
     keys.forEach((flatKey) => {
       // 处理转译的【.】
-      const decodeFlateKey = flatKey.replaceAll('\\.', '\\&AIOS&\\');
+      const decodeFlateKey = flatKey.replace('\\./g', '\\&AIOS&\\');
       const originKeyList = decodeFlateKey.split('.');
       const keyList: string[] = [];
       for (let i = 0; i < originKeyList.length; i++) {
-        keyList.push(originKeyList[i].replaceAll('\\&AIOS&\\', '.'));
+        keyList.push(originKeyList[i].replace('\\&AIOS&\\/g', '.'));
       }
       iterate(levelsObject, keyList, flatObject[flatKey]);
     });

@@ -48,6 +48,7 @@ const ApplicationPage = () => {
         title: '实例名称',
         dataIndex: 'instance_name',
         key: 'instance_name',
+        width: '301px',
         render: (value, record) => {
           return record.instance_name;
         },
@@ -65,6 +66,7 @@ const ApplicationPage = () => {
         title: '应用名称',
         dataIndex: 'chart_name',
         key: 'chart_name',
+        width: '240px',
         render: (value, record) => {
           return record.chart_name;
         },

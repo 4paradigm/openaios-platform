@@ -403,12 +403,6 @@ export interface ChartMetadata {
    * @type {string}
    * @memberof ChartMetadata
    */
-  showName?: string;
-  /**
-   *
-   * @type {string}
-   * @memberof ChartMetadata
-   */
   description?: string;
   /**
    *
@@ -471,6 +465,12 @@ export interface CompetitionInfo {
    * @memberof CompetitionInfo
    */
   avl?: boolean;
+  /**
+   *
+   * @type {number}
+   * @memberof CompetitionInfo
+   */
+  participant?: number;
   /**
    *
    * @type {Array<ComputeUnitSpec>}
@@ -624,6 +624,12 @@ export interface EnvironmentRuntimeInfo {
    * @memberof EnvironmentRuntimeInfo
    */
   pod_name?: string;
+  /**
+   *
+   * @type {Array<ApplicationInstanceEvent>}
+   * @memberof EnvironmentRuntimeInfo
+   */
+  events?: Array<ApplicationInstanceEvent>;
 }
 /**
  * environment runtime information list
@@ -836,6 +842,12 @@ export interface ImageInfo {
    * @memberof ImageInfo
    */
   tags?: Array<string>;
+  /**
+   *
+   * @type {string}
+   * @memberof ImageInfo
+   */
+  digest?: string;
   /**
    *
    * @type {string}
@@ -1241,7 +1253,13 @@ export interface UserTasksInfo {
    * @type {number}
    * @memberof UserTasksInfo
    */
-  task_num?: number;
+  env_num?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof UserTasksInfo
+   */
+  app_num?: number;
   /**
    *
    * @type {Array<UserTaskInfo>}
@@ -4237,15 +4255,19 @@ export const FinishedApiAxiosParamCreator = function (configuration?: Configurat
      *
      * @summary Delete image
      * @param {string} repo
-     * @param {string} tag
+     * @param {string} reference tag or digest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    imagesDelete: async (repo: string, tag: string, options: any = {}): Promise<RequestArgs> => {
+    imagesDelete: async (
+      repo: string,
+      reference: string,
+      options: any = {},
+    ): Promise<RequestArgs> => {
       // verify required parameter 'repo' is not null or undefined
       assertParamExists('imagesDelete', 'repo', repo);
-      // verify required parameter 'tag' is not null or undefined
-      assertParamExists('imagesDelete', 'tag', tag);
+      // verify required parameter 'reference' is not null or undefined
+      assertParamExists('imagesDelete', 'reference', reference);
       const localVarPath = `/images`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4265,8 +4287,8 @@ export const FinishedApiAxiosParamCreator = function (configuration?: Configurat
         localVarQueryParameter['repo'] = repo;
       }
 
-      if (tag !== undefined) {
-        localVarQueryParameter['tag'] = tag;
+      if (reference !== undefined) {
+        localVarQueryParameter['reference'] = reference;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -4866,60 +4888,6 @@ export const FinishedApiAxiosParamCreator = function (configuration?: Configurat
     },
     /**
      *
-     * @summary Upload chart
-     * @param {ChartCategory} category chart repo
-     * @param {any} [file] file type for upload and Download
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    uploadChart: async (
-      category: ChartCategory,
-      file?: any,
-      options: any = {},
-    ): Promise<RequestArgs> => {
-      // verify required parameter 'category' is not null or undefined
-      assertParamExists('uploadChart', 'category', category);
-      const localVarPath = `/appstore/charts/{category}`.replace(
-        `{${'category'}}`,
-        encodeURIComponent(String(category)),
-      );
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-      let baseOptions;
-      if (configuration) {
-        baseOptions = configuration.baseOptions;
-      }
-
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options };
-      const localVarHeaderParameter = {} as any;
-      const localVarQueryParameter = {} as any;
-      const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)();
-
-      // authentication ApiKeyAuth required
-      await setApiKeyToObject(localVarHeaderParameter, 'Authorization', configuration);
-
-      if (file !== undefined) {
-        localVarFormParams.append('file', file as any);
-      }
-
-      localVarHeaderParameter['Content-Type'] = 'multipart/form-data';
-
-      setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = {
-        ...localVarHeaderParameter,
-        ...headersFromBaseOptions,
-        ...options.headers,
-      };
-      localVarRequestOptions.data = localVarFormParams;
-
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      };
-    },
-    /**
-     *
      * @summary init user
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5398,16 +5366,20 @@ export const FinishedApiFp = function (configuration?: Configuration) {
      *
      * @summary Delete image
      * @param {string} repo
-     * @param {string} tag
+     * @param {string} reference tag or digest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async imagesDelete(
       repo: string,
-      tag: string,
+      reference: string,
       options?: any,
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.imagesDelete(repo, tag, options);
+      const localVarAxiosArgs = await localVarAxiosParamCreator.imagesDelete(
+        repo,
+        reference,
+        options,
+      );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -5627,26 +5599,6 @@ export const FinishedApiFp = function (configuration?: Configuration) {
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.storageUploadPost(
         path,
-        file,
-        options,
-      );
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-    },
-    /**
-     *
-     * @summary Upload chart
-     * @param {ChartCategory} category chart repo
-     * @param {any} [file] file type for upload and Download
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    async uploadChart(
-      category: ChartCategory,
-      file?: any,
-      options?: any,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.uploadChart(
-        category,
         file,
         options,
       );
@@ -6007,13 +5959,13 @@ export const FinishedApiFactory = function (
      *
      * @summary Delete image
      * @param {string} repo
-     * @param {string} tag
+     * @param {string} reference tag or digest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    imagesDelete(repo: string, tag: string, options?: any): AxiosPromise<void> {
+    imagesDelete(repo: string, reference: string, options?: any): AxiosPromise<void> {
       return localVarFp
-        .imagesDelete(repo, tag, options)
+        .imagesDelete(repo, reference, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -6176,19 +6128,6 @@ export const FinishedApiFactory = function (
     storageUploadPost(path?: string, file?: any, options?: any): AxiosPromise<void> {
       return localVarFp
         .storageUploadPost(path, file, options)
-        .then((request) => request(axios, basePath));
-    },
-    /**
-     *
-     * @summary Upload chart
-     * @param {ChartCategory} category chart repo
-     * @param {any} [file] file type for upload and Download
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    uploadChart(category: ChartCategory, file?: any, options?: any): AxiosPromise<void> {
-      return localVarFp
-        .uploadChart(category, file, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -6563,14 +6502,14 @@ export class FinishedApi extends BaseAPI {
    *
    * @summary Delete image
    * @param {string} repo
-   * @param {string} tag
+   * @param {string} reference tag or digest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof FinishedApi
    */
-  public imagesDelete(repo: string, tag: string, options?: any) {
+  public imagesDelete(repo: string, reference: string, options?: any) {
     return FinishedApiFp(this.configuration)
-      .imagesDelete(repo, tag, options)
+      .imagesDelete(repo, reference, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -6762,21 +6701,6 @@ export class FinishedApi extends BaseAPI {
 
   /**
    *
-   * @summary Upload chart
-   * @param {ChartCategory} category chart repo
-   * @param {any} [file] file type for upload and Download
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof FinishedApi
-   */
-  public uploadChart(category: ChartCategory, file?: any, options?: any) {
-    return FinishedApiFp(this.configuration)
-      .uploadChart(category, file, options)
-      .then((request) => request(this.axios, this.basePath));
-  }
-
-  /**
-   *
    * @summary init user
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
@@ -6812,15 +6736,19 @@ export const ImagesApiAxiosParamCreator = function (configuration?: Configuratio
      *
      * @summary Delete image
      * @param {string} repo
-     * @param {string} tag
+     * @param {string} reference tag or digest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    imagesDelete: async (repo: string, tag: string, options: any = {}): Promise<RequestArgs> => {
+    imagesDelete: async (
+      repo: string,
+      reference: string,
+      options: any = {},
+    ): Promise<RequestArgs> => {
       // verify required parameter 'repo' is not null or undefined
       assertParamExists('imagesDelete', 'repo', repo);
-      // verify required parameter 'tag' is not null or undefined
-      assertParamExists('imagesDelete', 'tag', tag);
+      // verify required parameter 'reference' is not null or undefined
+      assertParamExists('imagesDelete', 'reference', reference);
       const localVarPath = `/images`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6840,8 +6768,8 @@ export const ImagesApiAxiosParamCreator = function (configuration?: Configuratio
         localVarQueryParameter['repo'] = repo;
       }
 
-      if (tag !== undefined) {
-        localVarQueryParameter['tag'] = tag;
+      if (reference !== undefined) {
+        localVarQueryParameter['reference'] = reference;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter, options.query);
@@ -7326,16 +7254,20 @@ export const ImagesApiFp = function (configuration?: Configuration) {
      *
      * @summary Delete image
      * @param {string} repo
-     * @param {string} tag
+     * @param {string} reference tag or digest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async imagesDelete(
       repo: string,
-      tag: string,
+      reference: string,
       options?: any,
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.imagesDelete(repo, tag, options);
+      const localVarAxiosArgs = await localVarAxiosParamCreator.imagesDelete(
+        repo,
+        reference,
+        options,
+      );
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
     },
     /**
@@ -7532,13 +7464,13 @@ export const ImagesApiFactory = function (
      *
      * @summary Delete image
      * @param {string} repo
-     * @param {string} tag
+     * @param {string} reference tag or digest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    imagesDelete(repo: string, tag: string, options?: any): AxiosPromise<void> {
+    imagesDelete(repo: string, reference: string, options?: any): AxiosPromise<void> {
       return localVarFp
-        .imagesDelete(repo, tag, options)
+        .imagesDelete(repo, reference, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -7683,14 +7615,14 @@ export class ImagesApi extends BaseAPI {
    *
    * @summary Delete image
    * @param {string} repo
-   * @param {string} tag
+   * @param {string} reference tag or digest
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof ImagesApi
    */
-  public imagesDelete(repo: string, tag: string, options?: any) {
+  public imagesDelete(repo: string, reference: string, options?: any) {
     return ImagesApiFp(this.configuration)
-      .imagesDelete(repo, tag, options)
+      .imagesDelete(repo, reference, options)
       .then((request) => request(this.axios, this.basePath));
   }
 

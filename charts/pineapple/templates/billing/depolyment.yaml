@@ -32,15 +32,6 @@ spec:
           - name: {{ $k }}
             value: {{ quote $v }}
           {{- end }}
-        volumeMounts:
-          - mountPath: /etc/ssl/certs/pineapple.crt
-            subPath: ca.crt
-            readOnly: false
-            name: crt-secret-volume
-      volumes:
-        - secret:
-            secretName: {{ .Values.rootCA }}
-          name: crt-secret-volume
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

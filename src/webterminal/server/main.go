@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/4paradigm/openaios-platform/src/internal/auth"
-	"github.com/4paradigm/openaios-platform/src/webterminal/server/apigen"
-	"github.com/4paradigm/openaios-platform/src/webterminal/server/handler"
 	"github.com/labstack/echo-contrib/prometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
+	"github.com/4paradigm/openaios-platform/src/internal/auth"
+	"github.com/4paradigm/openaios-platform/src/webterminal/server/apigen"
+	"github.com/4paradigm/openaios-platform/src/webterminal/server/handler"
 )
 
 func main() {

@@ -20,10 +20,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/4paradigm/openaios-platform/src/internal/billingclient"
-	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/labstack/gommon/log"
 	"github.com/pkg/errors"
+	"github.com/4paradigm/openaios-platform/src/internal/billingclient"
+	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"k8s.io/api/admission/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -72,7 +72,7 @@ func applySecurityDefaults(req *v1beta1.AdmissionRequest) ([]patchOperation, err
 	}
 
 	// check if pod is application
-	if pod.Annotations["openaios.4paradigm.com/app"] != "true" {
+	if pod.Labels["openaios.4paradigm.com/app"] != "true" {
 		return nil, nil
 	}
 	// get user ID

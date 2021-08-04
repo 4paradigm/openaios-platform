@@ -12,23 +12,23 @@ import (
 func DownloadChart(url string) (*chart.Chart, error) {
 	realUrl, err := getChartrepoUrl(url)
 	if err != nil {
-		return nil, errors.Wrap(err, "getChartrepoUrl url error: " + utils.GetRuntimeLocation())
+		return nil, errors.Wrap(err, "getChartrepoUrl url error: "+utils.GetRuntimeLocation())
 	}
 	client := new(http.Client)
 	request, err := http.NewRequest("GET", realUrl, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewRequest error: " + utils.GetRuntimeLocation())
+		return nil, errors.Wrap(err, "NewRequest error: "+utils.GetRuntimeLocation())
 	}
 	request.Header.Add("Accept-Encoding", "gzip")
 	request.SetBasicAuth(conf.GetHarborAdmin())
 	resp, err := client.Do(request)
 	if err != nil {
-		return nil, errors.Wrap(err, "Get charts from url error: " + utils.GetRuntimeLocation())
+		return nil, errors.Wrap(err, "Get charts from url error: "+utils.GetRuntimeLocation())
 	}
 	defer resp.Body.Close()
 	chart, err := loader.LoadArchive(resp.Body)
 	if err != nil {
-		return nil, errors.Wrap(err, "LoadArchive from reader error: " + utils.GetRuntimeLocation())
+		return nil, errors.Wrap(err, "LoadArchive from reader error: "+utils.GetRuntimeLocation())
 	}
 	return chart, nil
 }
@@ -36,24 +36,24 @@ func DownloadChart(url string) (*chart.Chart, error) {
 func DownloadChartFiles(url string) ([]*chart.File, error) {
 	realUrl, err := getChartrepoUrl(url)
 	if err != nil {
-		return nil, errors.Wrap(err, "getChartrepoUrl url error: " + utils.GetRuntimeLocation())
+		return nil, errors.Wrap(err, "getChartrepoUrl url error: "+utils.GetRuntimeLocation())
 	}
 	client := new(http.Client)
 	request, err := http.NewRequest("GET", realUrl, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "NewRequest error: " + utils.GetRuntimeLocation())
+		return nil, errors.Wrap(err, "NewRequest error: "+utils.GetRuntimeLocation())
 	}
 	request.Header.Add("Accept-Encoding", "gzip")
 	request.SetBasicAuth(conf.GetHarborAdmin())
 	resp, err := client.Do(request)
 	if err != nil {
-		return nil, errors.Wrap(err, "Get charts from url error: " + utils.GetRuntimeLocation())
+		return nil, errors.Wrap(err, "Get charts from url error: "+utils.GetRuntimeLocation())
 	}
 	defer resp.Body.Close()
 
 	bufferedFiles, err := loader.LoadArchiveFiles(resp.Body)
 	if err != nil {
-		return nil, errors.Wrap(err, "LoadArchiveFiles error: " + utils.GetRuntimeLocation())
+		return nil, errors.Wrap(err, "LoadArchiveFiles error: "+utils.GetRuntimeLocation())
 	}
 	files, err := expandCharts(bufferedFiles)
 	if err != nil {

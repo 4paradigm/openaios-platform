@@ -1,3 +1,10 @@
+.mobile {
+  .view-msg-container {
+    .view-msg-content {
+      height: calc(100% - 100px);
+    }
+  }
+}
 .view-msg-container {
   .view-msg-content {
     margin-top: 16px;
@@ -67,6 +74,10 @@
   .view-msg-operation-bar {
     text-align: right;
     padding-top: 16px;
+    .id-rsa-pub-input{
+      width: 280px;
+      margin: 10px 0;
+    }
   }
   .invite-bar {
     margin: 16px 0;
@@ -89,16 +100,17 @@
       }
       .invite-person {
         margin-top: 16px;
-        .person-num {
-          color: @color-primary;
-          font-weight: 600;
-          display: inline-block;
-          padding: 0 3px;
-        }
       }
     }
+
     .right {
       flex: 1;
     }
+  }
+  .person-num {
+    color: @color-primary;
+    font-weight: 600;
+    display: inline-block;
+    padding: 0 3px;
   }
 }
