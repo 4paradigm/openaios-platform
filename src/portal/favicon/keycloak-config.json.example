@@ -1,8 +1,0 @@
-{
-  "realm": "develop",
-  "auth-server-url": "https://keycloak.pineapple-test.com/auth/",
-  "ssl-required": "external",
-  "resource": "pineapple",
-  "public-client": true,
-  "confidential-port": 0
-}
