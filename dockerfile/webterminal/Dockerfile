@@ -24,7 +24,7 @@ RUN cd src && CGO_ENABLED=0 go build -v -o /bin/web-terminal ./webterminal/serve
 RUN cd src && CGO_ENABLED=0 go build -v -o /bin/gotty ./webterminal/gotty
 
 FROM bitnami/kubectl:1.20.9
-
+USER root
 WORKDIR /root
 
 COPY --from=build /bin/gotty /root/gotty
