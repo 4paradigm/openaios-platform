@@ -1,30 +1,18 @@
-FROM golang:1.14-alpine AS build
-WORKDIR /src/
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories \
-    && apk update \
-    && apk --no-cache add ca-certificates git bash
-ENV GO111MODULE on
-ENV GOPROXY http://goproxy.cn,direct
+ARG BUILDBASE=golang:1.16.6-buster
+FROM $BUILDBASE AS build
 
-# fetch dependencies
-RUN mkdir -p ./src
-COPY ./src/go.mod ./src/go.mod
+WORKDIR /build
+COPY . .
+ARG GOPROXY=https://goproxy.cn,direct
 RUN cd src && go mod download -x
+RUN make pineapple
 
-RUN mkdir -p ./doc
-COPY ./doc/api ./doc/api
-COPY ./build.sh ./
-RUN ./build.sh billing-oapi-codegen
+#FROM broothie/redoc-cli:0.9.8 AS doc
+#WORKDIR /root
+#COPY ./doc/api/billing.yaml ./
+#RUN redoc-cli bundle -o billing.html billing.yaml
 
-# build
-COPY ./src ./src/
-RUN cd src && CGO_ENABLED=0 go build -v -o /bin/billing ./billing
-
-FROM broothie/redoc-cli:0.9.8 AS doc
-WORKDIR /root
-COPY ./doc/api/billing.yaml ./
-RUN redoc-cli bundle -o billing.html billing.yaml
 
 FROM alpine AS target
 WORKDIR /root
-COPY --from=build /bin/billing /root/billing
+COPY --from=build /build/bin/billing /root/billing

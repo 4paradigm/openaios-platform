@@ -58,6 +58,8 @@ case $command in
     args=$(tr "\\n" " " < ./configs/billing-local-dev.conf)
     env -vS "${args[@]}" ./build/billing
   ;;
+  all)
+  ;;
   *)
     usage
   ;;

@@ -1,18 +1,28 @@
 stages:
-  - build
+  #- check
+  #- build
+  - build_image
 
 variables:
-  CORE_IMAGE_REGISTRY: 'docker.4pd.io/adc/pineapple/core'
-  BILLING_IMAGE_REGISTRY: 'docker.4pd.io/adc/pineapple/billing'
-  PORTAL_IMAGE_REGISTRY: 'docker.4pd.io/adc/pineapple/portal'
-  WEBTERMINAL_IMAGE_REGISTRY: 'docker.4pd.io/adc/pineapple/webterminal'
-  WEBHOOK_IMAGE_REGISTRY: 'docker.4pd.io/adc/pineapple/webhook'
+  CORE_IMAGE: '${IMAGE_REGISTRY}/core'
+  BILLING_IMAGE: '${IMAGE_REGISTRY}/billing'
+  PORTAL_IMAGE: '${IMAGE_REGISTRY}/portal'
+  WEBTERMINAL_IMAGE: '${IMAGE_REGISTRY}/webterminal'
+  WEBHOOK_IMAGE: '${IMAGE_REGISTRY}/webhook'
+  DIND_IMAGE: "docker.4pd.io/build:11.0"
+
+static_check:
+  stage: check
+  image: golang:1.16.6-buster
+  script:
+    - make lint
+    - make vet
 
 build_core_image:
-  stage: build
-  image: 'docker.4pd.io/build:11.0'
+  stage: build_image
+  image: '${DIND_IMAGE}'
   before_script:
-    - IMAGE_TAG=${CORE_IMAGE_REGISTRY}:${CI_COMMIT_SHA}
+    - IMAGE_TAG=${CORE_IMAGE}:${CI_COMMIT_SHA}
   script:
     - docker build -t ${IMAGE_TAG} -f ./dockerfile/webserver/Dockerfile .
     - docker push ${IMAGE_TAG}
@@ -20,10 +30,10 @@ build_core_image:
     - master
 
 build_billing_image:
-  stage: build
-  image: 'docker.4pd.io/build:11.0'
+  stage: build_image
+  image: '${DIND_IMAGE}'
   before_script:
-    - IMAGE_TAG=${BILLING_IMAGE_REGISTRY}:${CI_COMMIT_SHA}
+    - IMAGE_TAG=${BILLING_IMAGE}:${CI_COMMIT_SHA}
   script:
     - docker build -t ${IMAGE_TAG} -f ./dockerfile/billing-server/Dockerfile .
     - docker push ${IMAGE_TAG}
@@ -31,10 +41,10 @@ build_billing_image:
     - master
 
 build_webterminal_image:
-  stage: build
-  image: 'docker.4pd.io/build:11.0'
+  stage: build_image
+  image: '${DIND_IMAGE}'
   before_script:
-    - IMAGE_TAG=${WEBTERMINAL_IMAGE_REGISTRY}:${CI_COMMIT_SHA}
+    - IMAGE_TAG=${WEBTERMINAL_IMAGE}:${CI_COMMIT_SHA}
   script:
     - docker build -t ${IMAGE_TAG} -f ./dockerfile/webterminal/Dockerfile .
     - docker push ${IMAGE_TAG}
@@ -42,10 +52,10 @@ build_webterminal_image:
     - master
 
 build_webhook_image:
-  stage: build
-  image: 'docker.4pd.io/build:11.0'
+  stage: build_image
+  image: '${DIND_IMAGE}'
   before_script:
-    - IMAGE_TAG=${WEBHOOK_IMAGE_REGISTRY}:${CI_COMMIT_SHA}
+    - IMAGE_TAG=${WEBHOOK_IMAGE}:${CI_COMMIT_SHA}
   script:
     - docker build -t ${IMAGE_TAG} -f ./dockerfile/webhook/Dockerfile .
     - docker push ${IMAGE_TAG}

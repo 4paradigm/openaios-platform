@@ -3,7 +3,7 @@
 .DS_Store
 **/apigen
 build
-
+bin/
 
 # dependencies
 /node_modules
