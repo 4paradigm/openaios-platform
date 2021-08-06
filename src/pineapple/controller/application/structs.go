@@ -17,8 +17,8 @@
 package application
 
 import (
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	"time"
 )
@@ -64,7 +64,7 @@ type ContainerInfo struct {
 	Name  string          `json:"name,omitempty"`
 	Image string          `json:"image,omitempty"`
 	State string          `json:"state,omitempty"`
-	ports []ContainerPort `json:"ports,omitempty"`
+	Ports []ContainerPort `json:"ports,omitempty"`
 }
 
 type ContainerPort struct {

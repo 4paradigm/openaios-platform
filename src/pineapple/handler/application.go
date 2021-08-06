@@ -17,12 +17,12 @@
 package handler
 
 import (
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/controller/application"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"net/http"
 	"regexp"
 	"strings"
@@ -128,7 +128,7 @@ func createApplicationInfo(requestBody *apigen.CreateApplicationJSONRequestBody,
 		return nil, err
 	}
 	appInfo := application.ApplicationInfo{
-		pineappleInfo,
+		PineappleInfo: pineappleInfo,
 	}
 	appInfo.SetValues(*requestBody.Answers)
 

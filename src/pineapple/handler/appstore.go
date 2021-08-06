@@ -19,14 +19,14 @@ package handler
 import (
 	"archive/tar"
 	"archive/zip"
-	"github.com/klauspost/compress/gzip"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
+	"github.com/klauspost/compress/gzip"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -87,7 +87,7 @@ func getChartList(category apigen.ChartCategory, repo string) ([]apigen.ChartMet
 		icon := c.Icon
 		chartVersionDetails, err := utils.GetChartrepoRepoChartsNameVersion(client, repo, *name, version)
 		if err != nil {
-			return nil, errors.WithMessagef(err, "GetChartrepoRepoChartsNameVersion err: Name: %s, Version: %s", name, version)
+			return nil, errors.WithMessagef(err, "GetChartrepoRepoChartsNameVersion err: Name: %s, Version: %s", *name, version)
 		}
 		description := chartVersionDetails.Metadata.Description
 		url := filepath.Join("chartrepo", repo, chartVersionDetails.Metadata.Urls[0])

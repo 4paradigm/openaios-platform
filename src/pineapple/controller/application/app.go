@@ -18,9 +18,9 @@ package application
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
+	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/api/core/v1"
@@ -140,14 +140,14 @@ func (a *ApplicationImpl) GetApplicationPodsInfo(appName string) (*ApplicationPo
 				Name:  c.Name,
 				Image: c.Image,
 				State: "",
-				ports: nil,
+				Ports: nil,
 			}
 			containerPorts := make([]ContainerPort, len(c.Ports))
 			for k, p := range c.Ports {
 				containerPorts[k].ContainerPort = strconv.Itoa(int(p.ContainerPort))
 				containerPorts[k].Protocol = string(p.Protocol)
 			}
-			container.ports = containerPorts
+			container.Ports = containerPorts
 			containersMap[c.Name] = &container
 		}
 		for _, c := range (*pods)[i].Status.ContainerStatuses {
