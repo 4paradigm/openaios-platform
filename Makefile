@@ -49,8 +49,8 @@ gotty: webterminal_oapi_codegen
 deps: apigen internalapigen billing_client_codegen billing_oapi_codegen webterminal_oapi_codegen
 
 lint: deps
-	$(GO) get -u golang.org/x/lint/golint
-	cd src && golint ./...
+	$(GO) install honnef.co/go/tools/cmd/staticcheck@latest
+	cd src && staticcheck ./...
 
 vet:
 	cd src && go vet ./...
