@@ -7,7 +7,7 @@
 
 ## handler
 实现了对外的接口（主要是对webserver以及webhook），接口文档是`doc/api/billing.yaml`
-注意：instance这个接口已经被废弃，但是还没有删除。
+注意：instance这个接口已经被废弃。
 
 ## utils
 实现了一些工具包，方便handler使用

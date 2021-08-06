@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
+// Package handler implements methods for
 package handler
 
 import (
-	"github.com/labstack/gommon/log"
 	"github.com/4paradigm/openaios-platform/src/billing/conf"
 	"github.com/4paradigm/openaios-platform/src/billing/utils"
 	"github.com/4paradigm/openaios-platform/src/internal/mongodb"
+	"github.com/labstack/gommon/log"
 )
 
 type Handler struct{}
 
-var mongodbUrl = conf.GetMongodbUrl()
+var mongodbURL = conf.GetmongodbURL()
 
 func NewHandler() Handler {
 	return Handler{}
@@ -33,7 +34,7 @@ func NewHandler() Handler {
 
 func InitBillingServer() {
 	// init mongodb collection
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	defer mongodb.KillMongodbClient(client)
 	if err != nil {
 		log.Error(err.Error())

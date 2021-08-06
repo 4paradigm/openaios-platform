@@ -20,10 +20,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/labstack/gommon/log"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/billingclient"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
+	"github.com/labstack/gommon/log"
+	"github.com/pkg/errors"
 	"k8s.io/api/admission/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -79,7 +79,7 @@ func applySecurityDefaults(req *v1beta1.AdmissionRequest) ([]patchOperation, err
 	userID := req.Namespace
 	// get computeunitMap in annotation
 	var containerComputeunitMap = map[string]string{}
-	var defaultComputeunit string = ""
+	var defaultComputeunit string
 	for k, v := range pod.Annotations {
 		if strings.HasPrefix(k, "openaios.4paradigm.com/computeunit.") {
 			containerName := strings.TrimPrefix(k, "openaios.4paradigm.com/computeunit.")

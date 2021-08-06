@@ -18,21 +18,21 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/labstack/gommon/log"
-	"github.com/pkg/errors"
-	"github.com/robfig/cron/v3"
 	"github.com/4paradigm/openaios-platform/src/billing/conf"
 	"github.com/4paradigm/openaios-platform/src/billing/utils"
 	"github.com/4paradigm/openaios-platform/src/internal/mongodb"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
+	"github.com/labstack/gommon/log"
+	"github.com/pkg/errors"
+	"github.com/robfig/cron/v3"
 	"time"
 )
 
 func run() {
-	mongodbUrl := conf.GetMongodbUrl()
+	mongodbURL := conf.GetmongodbURL()
 
 	// init mongodb client
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	defer mongodb.KillMongodbClient(client)
 	if err != nil {
 		log.Error(err.Error())
@@ -99,16 +99,16 @@ func run() {
 		}
 
 		// update mongodb
-		err = utils.UpdateOrInsertPod(client, utils.PodInfo{UserId: userID, PodName: podName, PodUID: podUID,
-			InstanceId: instanceID, ComputeunitList: computeunitList, StartTime: startTime, UpdateTime: updateTime})
+		err = utils.UpdateOrInsertPod(client, utils.PodInfo{UserID: userID, PodName: podName, PodUID: podUID,
+			InstanceID: instanceID, ComputeunitList: computeunitList, StartTime: startTime, UpdateTime: updateTime})
 		if err != nil {
 			log.Error(err)
 		}
 	}
 
 	// check user account map
-	for userId, cost := range billMap {
-		err = utils.ModifyUserBalance(client, userId, cost)
+	for userID, cost := range billMap {
+		err = utils.ModifyUserBalance(client, userID, cost)
 		if err != nil {
 			log.Error(errors.Wrap(err, response.GetRuntimeLocation()))
 		}

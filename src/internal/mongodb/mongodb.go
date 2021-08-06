@@ -41,10 +41,10 @@ type ComparisonQueryOperator struct {
 	Value     interface{}
 }
 
-func GetMongodbClient(mongodbUrl string) (*mongo.Client, error) {
+func GetMongodbClient(mongodbURL string) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongodbUrl))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongodbURL))
 	if err != nil {
 		return nil, err
 	}

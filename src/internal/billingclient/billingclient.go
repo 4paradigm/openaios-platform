@@ -19,10 +19,10 @@ package billingclient
 import (
 	"context"
 	"encoding/json"
-	"github.com/labstack/gommon/log"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/billingclient/apigen"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
+	"github.com/labstack/gommon/log"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -147,35 +147,6 @@ func GetComputeUnitListByGroupName(client *apigen.Client, groupName string) ([]a
 		return nil, errors.Wrap(err, "cannot get computeunit list "+response.GetRuntimeLocation())
 	}
 	return computeunitList, nil
-}
-
-func CreateInstance(client *apigen.Client, instanceName string, userID string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	params := apigen.PostInstanceParams{InstanceName: instanceName, UserId: userID}
-	resp, err := client.PostInstance(ctx, &params)
-	if err != nil {
-		return "", errors.Wrap(err, "cannot create instance "+response.GetRuntimeLocation())
-	}
-	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return "", errors.Wrap(err, "cannot create instance "+response.GetRuntimeLocation())
-		}
-		if resp.StatusCode == http.StatusBadRequest {
-			var respBody apigen.RequestError
-			err = json.Unmarshal(body, &respBody)
-			if err != nil {
-				return "", errors.Wrap(err, "cannot create instance "+response.GetRuntimeLocation())
-			}
-			if respBody.Message != nil {
-				return "", errors.New(*respBody.Message + response.GetRuntimeLocation())
-			}
-		}
-		return "", errors.New("cannot create instance " + response.GetRuntimeLocation())
-	}
-	body, err := ioutil.ReadAll(resp.Body)
-	return string(body), nil
 }
 
 func GetComputeUnitPrice(client *apigen.Client, ComputeUnitID string) (float64, error) {

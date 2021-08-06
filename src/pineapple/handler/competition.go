@@ -53,9 +53,9 @@ var mongodbCompetitionsColl = "competitions"
 
 func (handler *Handler) GetCompetitionCompetitionID(ctx echo.Context, competitionID string) error {
 	userID := ctx.Get("userID").(string)
-	mongodbUrl := conf.GetMongodbUrl()
+	mongodbURL := conf.GetmongodbURL()
 	database := conf.GetMongodbDatabase()
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	if err != nil {
 		return echo.NewHTTPError(
 			http.StatusInternalServerError, "check competition failed.").SetInternal(
@@ -79,9 +79,9 @@ func (handler *Handler) GetCompetitionCompetitionID(ctx echo.Context, competitio
 func (handler *Handler) PostCompetitionCompetitionID(ctx echo.Context, competitionID string,
 	params apigen.PostCompetitionCompetitionIDParams) error {
 	userID := ctx.Get("userID").(string)
-	mongodbUrl := conf.GetMongodbUrl()
+	mongodbURL := conf.GetmongodbURL()
 	database := conf.GetMongodbDatabase()
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	if err != nil {
 		return echo.NewHTTPError(
 			http.StatusInternalServerError, "join competition failed.").SetInternal(
@@ -161,9 +161,9 @@ func (handler *Handler) PostCompetitionCompetitionID(ctx echo.Context, competiti
 }
 
 func (handler *Handler) GetCompetition(ctx echo.Context, params apigen.GetCompetitionParams) error {
-	mongodbUrl := conf.GetMongodbUrl()
+	mongodbURL := conf.GetmongodbURL()
 	database := conf.GetMongodbDatabase()
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	if err != nil {
 		return echo.NewHTTPError(
 			http.StatusInternalServerError, "check competition failed.").SetInternal(
@@ -232,9 +232,9 @@ func (handler *Handler) GetCompetition(ctx echo.Context, params apigen.GetCompet
 }
 
 func (handler *Handler) GetCompetitionCompetitionIDInvitation(ctx echo.Context, competitionID string) error {
-	mongodbUrl := conf.GetMongodbUrl()
+	mongodbURL := conf.GetmongodbURL()
 	database := conf.GetMongodbDatabase()
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	if err != nil {
 		return echo.NewHTTPError(
 			http.StatusInternalServerError, "check competition failed.").SetInternal(

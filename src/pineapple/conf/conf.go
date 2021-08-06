@@ -58,7 +58,7 @@ var (
 		"harbor admin password")
 	harborStorageLimit = flag.String("images-storage-limit", os.Getenv("PINEAPPLE_HARBOR_STORAGE_LIMIT"),
 		"user image storage limit")
-	mongodbUrl = flag.String("mongodb-url", os.Getenv("PINEAPPLE_MONGODB_URL"),
+	mongodbURL = flag.String("mongodb-url", os.Getenv("PINEAPPLE_MONGODB_URL"),
 		"mongodb url")
 	mongodbDatabase = flag.String("mongodb-database", os.Getenv("PINEAPPLE_MONGODB_DATABASE"),
 		"mongodb database")
@@ -177,8 +177,8 @@ func getKubeTokenFile() string {
 	return "/var/run/secrets/kubernetes.io/serviceaccount/token"
 }
 
-func GetMongodbUrl() string {
-	return *mongodbUrl
+func GetmongodbURL() string {
+	return *mongodbURL
 }
 
 func GetMongodbDatabase() string {

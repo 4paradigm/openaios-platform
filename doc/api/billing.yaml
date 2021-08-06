@@ -265,37 +265,6 @@ paths:
         500:
           $ref: "#/components/responses/ServerError"
 
-
-  /instance:
-    post:
-      tags:
-        - instance
-      summary: create instance
-      parameters:
-        - in: query
-          name: instanceName
-          required: true
-          schema:
-            type: string
-            description: instance name
-        - in: query
-          name: userId
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: string
-        400:
-          $ref: "#/components/responses/RequestError"
-        500:
-          $ref: "#/components/responses/ServerError"
-
-
 components:
   securitySchemes:
     ApiKeyAuth:

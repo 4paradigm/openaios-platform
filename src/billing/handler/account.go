@@ -18,18 +18,19 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/billing/apigen"
 	"github.com/4paradigm/openaios-platform/src/billing/utils"
 	"github.com/4paradigm/openaios-platform/src/internal/mongodb"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"net/http"
 	"strings"
 )
 
+// GetAccount returns AccountInfo list json to clients.
 func (h Handler) GetAccount(ctx echo.Context) error {
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	defer mongodb.KillMongodbClient(client)
 	if err != nil {
 		return echo.NewHTTPError(
@@ -46,9 +47,9 @@ func (h Handler) GetAccount(ctx echo.Context) error {
 
 	newAccountList := []apigen.AccountInfo{}
 	for _, item := range accountList {
-		userID := item.UserId
+		userID := item.UserID
 		balance := item.Balance
-		callbackURL := item.CallbackUrl
+		callbackURL := item.CallbackURL
 		computeunitGroup := item.ComputeunitGroup
 		accountInfo := apigen.AccountInfo{
 			UserID:           &userID,
@@ -60,8 +61,9 @@ func (h Handler) GetAccount(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, newAccountList)
 }
 
+// PutAccountUserid updates specific user's account.
 func (h Handler) PutAccountUserid(ctx echo.Context, userid string) error {
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	defer mongodb.KillMongodbClient(client)
 	if err != nil {
 		return echo.NewHTTPError(
@@ -87,8 +89,9 @@ func (h Handler) PutAccountUserid(ctx echo.Context, userid string) error {
 	return response.StatusOKNoContent(ctx)
 }
 
+// DeleteAccountUserid deletes specific user account.
 func (h Handler) DeleteAccountUserid(ctx echo.Context, userid string) error {
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	defer mongodb.KillMongodbClient(client)
 	if err != nil {
 		return echo.NewHTTPError(
@@ -105,8 +108,9 @@ func (h Handler) DeleteAccountUserid(ctx echo.Context, userid string) error {
 	return response.StatusOKNoContent(ctx)
 }
 
+// PostAccountUserid create new user's account.
 func (h Handler) PostAccountUserid(ctx echo.Context, userid string, params apigen.PostAccountUseridParams) error {
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	defer mongodb.KillMongodbClient(client)
 	if err != nil {
 		return echo.NewHTTPError(
@@ -127,8 +131,9 @@ func (h Handler) PostAccountUserid(ctx echo.Context, userid string, params apige
 	return response.StatusOKNoContent(ctx)
 }
 
+// GetAccountUseridBalance returns specific user's balance.
 func (h Handler) GetAccountUseridBalance(ctx echo.Context, userid string) error {
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	defer mongodb.KillMongodbClient(client)
 	if err != nil {
 		return echo.NewHTTPError(
@@ -145,8 +150,9 @@ func (h Handler) GetAccountUseridBalance(ctx echo.Context, userid string) error 
 	return ctx.JSON(http.StatusOK, balance)
 }
 
+// PostAccountUseridBalance modifies specific user's balance.
 func (h Handler) PostAccountUseridBalance(ctx echo.Context, userid string, params apigen.PostAccountUseridBalanceParams) error {
-	client, err := mongodb.GetMongodbClient(mongodbUrl)
+	client, err := mongodb.GetMongodbClient(mongodbURL)
 	defer mongodb.KillMongodbClient(client)
 	if err != nil {
 		return echo.NewHTTPError(

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package conf implements methods to get mongodb configs from flags or environment variables.
 package conf
 
 import (
@@ -22,16 +23,18 @@ import (
 )
 
 var (
-	mongodbUrl = flag.String("mongodb-url", os.Getenv("PINEAPPLE_MONGODB_URL"),
+	mongodbURL = flag.String("mongodb-url", os.Getenv("PINEAPPLE_MONGODB_URL"),
 		"mongodb url")
 	mongodbDatabase = flag.String("mongodb-database", os.Getenv("PINEAPPLE_MONGODB_DATABASE"),
 		"mongodb database")
 )
 
-func GetMongodbUrl() string {
-	return *mongodbUrl
+// GetmongodbURL returns mongodbURL string
+func GetmongodbURL() string {
+	return *mongodbURL
 }
 
+// GetMongodbDatabase returns mongodbDatabase string
 func GetMongodbDatabase() string {
 	return *mongodbDatabase
 }

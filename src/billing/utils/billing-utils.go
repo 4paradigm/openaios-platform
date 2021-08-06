@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
+// Package utils implements utility methods
 package utils
 
 import (
 	"context"
-	"github.com/labstack/gommon/log"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/billing/conf"
 	"github.com/4paradigm/openaios-platform/src/internal/mongodb"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
+	"github.com/labstack/gommon/log"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"k8s.io/apimachinery/pkg/types"
 	"net/http"
@@ -30,10 +31,10 @@ import (
 )
 
 type PodInfo struct {
-	UserId          string    `bson:"userId,omitempty"`
+	UserID          string    `bson:"userId,omitempty"`
 	PodName         string    `bson:"podName,omitempty"`
 	PodUID          types.UID `bson:"podUID,omitempty"`
-	InstanceId      string    `bson:"instanceId,omitempty"`
+	InstanceID      string    `bson:"instanceId,omitempty"`
 	ComputeunitList []string  `bson:"computeunitList,omitempty"`
 	StartTime       time.Time `bson:"startTime,omitempty"`
 	UpdateTime      time.Time `bson:"updateTime,omitempty"`
@@ -41,23 +42,22 @@ type PodInfo struct {
 }
 
 type AccountInfo struct {
-	UserId           string   `bson:"userId,omitempty"`
+	UserID           string   `bson:"userId,omitempty"`
 	Balance          *float64 `bson:"balance,omitempty"`
-	CallbackUrl      string   `bson:"callbackUrl,omitempty"`
+	CallbackURL      string   `bson:"callbackUrl,omitempty"`
 	ComputeunitGroup []string `bson:"computeunitGroup,omitempty"`
 }
 
 type InstanceInfo struct {
 	// using _id as instance id
 	InstanceName string `bson:"instanceName,omitempty"`
-	UserId       string `bson:"userId,omitempty"`
+	UserID       string `bson:"userId,omitempty"`
 }
 
 var database = conf.GetMongodbDatabase()
 
 var podColl = "pod"
 var userColl = "user"
-var instanceColl = "instance"
 var computeunitGroupColl = "computeunitGroup"
 var computeunitColl = "computeunit"
 
@@ -81,18 +81,18 @@ func InitColl(client *mongo.Client) error {
 	return nil
 }
 
-func CreateUserWithBalance(client *mongo.Client, userId string,
-	balance float64, callbackUrl string) error {
+func CreateUserWithBalance(client *mongo.Client, userID string,
+	balance float64, callbackURL string) error {
 	_, err := mongodb.InsertOneDocument(client, database, userColl,
-		AccountInfo{UserId: userId,
+		AccountInfo{UserID: userID,
 			Balance:          &balance,
-			CallbackUrl:      callbackUrl,
+			CallbackURL:      callbackURL,
 			ComputeunitGroup: []string{"default"}})
 	return errors.Wrap(err, response.GetRuntimeLocation())
 }
 
-func GetUserBalance(client *mongo.Client, userId string) (float64, error) {
-	uniqueKey := AccountInfo{UserId: userId}
+func GetUserBalance(client *mongo.Client, userID string) (float64, error) {
+	uniqueKey := AccountInfo{UserID: userID}
 	document := mongodb.FindOneDocument(client, database, userColl, uniqueKey)
 	if document == nil {
 		return 0, errors.New("Cannot find user " + response.GetRuntimeLocation())
@@ -106,13 +106,13 @@ func GetUserBalance(client *mongo.Client, userId string) (float64, error) {
 	}
 }
 
-func DeleteUser(client *mongo.Client, userId string) error {
-	uniqueKey := AccountInfo{UserId: userId}
+func DeleteUser(client *mongo.Client, userID string) error {
+	uniqueKey := AccountInfo{UserID: userID}
 	return mongodb.DeleteOneDocument(client, database, userColl, uniqueKey)
 }
 
-func ModifyUserBalance(client *mongo.Client, userId string, balance float64) error {
-	uniqueKey := AccountInfo{UserId: userId}
+func ModifyUserBalance(client *mongo.Client, userID string, balance float64) error {
+	uniqueKey := AccountInfo{UserID: userID}
 	minBalance := 0.0
 	_, err := mongodb.UpdateOneDocument(client, database, userColl, uniqueKey,
 		mongodb.MongodbOperation{Operator: "$inc", Document: AccountInfo{Balance: &balance}})
@@ -133,13 +133,13 @@ func ModifyUserBalance(client *mongo.Client, userId string, balance float64) err
 func UpdateUserAccount(client *mongo.Client, userID string, balance *float64,
 	callbackURL *string, computeunitGroup *[]string) error {
 	accountInfo := AccountInfo{}
-	uniqueKey := AccountInfo{UserId: userID}
+	uniqueKey := AccountInfo{UserID: userID}
 
 	if balance != nil {
 		accountInfo.Balance = balance
 	}
 	if callbackURL != nil {
-		accountInfo.CallbackUrl = *callbackURL
+		accountInfo.CallbackURL = *callbackURL
 	}
 	if computeunitGroup != nil {
 		accountInfo.ComputeunitGroup = *computeunitGroup
@@ -184,9 +184,9 @@ func CheckUserNoBalance(client *mongo.Client, billMap map[string]float64) error 
 		err = cursor.Decode(&accountInfo)
 		if err != nil {
 			log.Error(err.Error())
-		} else if _, ok := billMap[accountInfo.UserId]; ok {
-			log.Warn(accountInfo.UserId + " has no balance.")
-			request, err := http.NewRequest(http.MethodDelete, accountInfo.CallbackUrl, nil)
+		} else if _, ok := billMap[accountInfo.UserID]; ok {
+			log.Warn(accountInfo.UserID + " has no balance.")
+			request, err := http.NewRequest(http.MethodDelete, accountInfo.CallbackURL, nil)
 			if err != nil {
 				log.Error(err.Error())
 				continue
@@ -207,27 +207,9 @@ func CheckUserNoBalance(client *mongo.Client, billMap map[string]float64) error 
 func UpdateOrInsertPod(client *mongo.Client, pod PodInfo) error {
 	uniqueKey := PodInfo{PodUID: pod.PodUID}
 	podInfo := PodInfo{ComputeunitList: pod.ComputeunitList, StartTime: pod.StartTime, PodName: pod.PodName,
-		UpdateTime: pod.UpdateTime, PodUID: pod.PodUID, UserId: pod.UserId, InstanceId: pod.InstanceId}
+		UpdateTime: pod.UpdateTime, PodUID: pod.PodUID, UserID: pod.UserID, InstanceID: pod.InstanceID}
 	setOperation := mongodb.MongodbOperation{Operator: "$set", Document: podInfo}
 	incOperation := mongodb.MongodbOperation{Operator: "$inc", Document: PodInfo{Count: 1}}
 	return mongodb.UpdateOrInsertOneDocument(client, database, podColl,
 		uniqueKey, setOperation, incOperation)
-}
-
-func CreateInstance(client *mongo.Client, userId string, instanceName string) (string, error) {
-	balance, err := GetUserBalance(client, userId)
-	if err != nil {
-		log.Error(err.Error())
-		return "", errors.New("Cannot find user.")
-	} else if balance <= 0 {
-		return "", errors.New("User does not have enough balance.")
-	}
-
-	// create instance
-	instanceInfo := InstanceInfo{InstanceName: instanceName, UserId: userId}
-	result, err := mongodb.InsertOneDocument(client, database, instanceColl, instanceInfo)
-	if err != nil {
-		return "", err
-	}
-	return mongodb.InsertedIdToObjectId(result.InsertedID)
 }
