@@ -5,7 +5,7 @@ WORKDIR /build
 COPY . .
 ARG GOPROXY=https://goproxy.cn,direct
 RUN cd src && go mod download -x
-RUN make pineapple
+RUN make billing
 
 #FROM broothie/redoc-cli:0.9.8 AS doc
 #WORKDIR /root
