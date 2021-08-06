@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package webterminal provides controller for webterminal.
 package webterminal
 
 import (
@@ -31,7 +32,7 @@ type Webterminal struct {
 	BearerToken   string `json:"bearer_token"`
 }
 
-type GetTerminalApiResponse struct {
+type GetTerminalAPIResponse struct {
 	Success bool   `json:"success"`
 	Token   string `json:"token"`
 	Message string `json:"message"`
@@ -42,8 +43,8 @@ func GetWebterminal(terminalInfo Webterminal) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "Marshal terminalInfo error: ")
 	}
-	gottyUrl := "http://127.0.0.1:8080/api/get-terminal"
-	req, err := http.NewRequest("POST", gottyUrl, bytes.NewBuffer(reqBody))
+	gottyURL := "http://127.0.0.1:8080/api/get-terminal"
+	req, err := http.NewRequest("POST", gottyURL, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return "", errors.Wrap(err, "http.NewRequest error: ")
 	}
@@ -64,7 +65,7 @@ func GetWebterminal(terminalInfo Webterminal) (string, error) {
 		return "", errors.Wrap(err, "read resp body error: ")
 	}
 
-	respBody := new(GetTerminalApiResponse)
+	respBody := new(GetTerminalAPIResponse)
 	if err := json.Unmarshal(body, respBody); err != nil {
 		return "", errors.Wrap(err, "Unmarshal resp body error: ")
 	}

@@ -29,9 +29,9 @@ import (
 )
 
 func (handler *Handler) GetApplicationList(ctx echo.Context, params apigen.GetApplicationListParams) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
-	appImpl, err := application.NewApplicationImpl(bearerToken, userId)
+	appImpl, err := application.NewApplicationImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -52,9 +52,9 @@ func (handler *Handler) GetApplicationList(ctx echo.Context, params apigen.GetAp
 }
 
 func (handler *Handler) DeleteApplication(ctx echo.Context, name string) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
-	appImpl, err := application.NewApplicationImpl(bearerToken, userId)
+	appImpl, err := application.NewApplicationImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -75,7 +75,7 @@ func (handler *Handler) CreateApplication(ctx echo.Context, name string) error {
 	if !regex.MatchString(string(name)) {
 		return response.BadRequestWithMessagef(ctx, "应用名%s不合法，须符合正则表达式'[a-z]([-a-z0-9]*[a-z0-9])?'", name)
 	}
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
 	requestBody := new(apigen.CreateApplicationJSONRequestBody)
 	if err := ctx.Bind(requestBody); err != nil {
@@ -86,7 +86,7 @@ func (handler *Handler) CreateApplication(ctx echo.Context, name string) error {
 		return response.BadRequestWithMessage(ctx, err.Error())
 	}
 
-	appInfo, err := createApplicationInfo(requestBody, name, userId)
+	appInfo, err := createApplicationInfo(requestBody, name, userID)
 	if err != nil {
 		if strings.Contains(err.Error(), "User does not have enough balance") {
 			return response.BadRequestWithMessage(ctx, "您的余额不足，无法创建应用")
@@ -94,7 +94,7 @@ func (handler *Handler) CreateApplication(ctx echo.Context, name string) error {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
 
-	appImpl, err := application.NewApplicationImpl(bearerToken, userId)
+	appImpl, err := application.NewApplicationImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -122,8 +122,8 @@ func checkCreateApplicationJSONRequestBody(requestBody *apigen.CreateApplication
 	return nil
 }
 
-func createApplicationInfo(requestBody *apigen.CreateApplicationJSONRequestBody, appName string, userId string) (*application.ApplicationInfo, error) {
-	pineappleInfo, err := helm.NewPineappleInfo(appName, userId, application.AppPrefix)
+func createApplicationInfo(requestBody *apigen.CreateApplicationJSONRequestBody, appName string, userID string) (*application.ApplicationInfo, error) {
+	pineappleInfo, err := helm.NewPineappleInfo(appName, userID, application.AppPrefix)
 	if err != nil {
 		return nil, err
 	}
@@ -136,9 +136,9 @@ func createApplicationInfo(requestBody *apigen.CreateApplicationJSONRequestBody,
 }
 
 func (handler *Handler) GetApplicationMetadata(ctx echo.Context, name string) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
-	appImpl, err := application.NewApplicationImpl(bearerToken, userId)
+	appImpl, err := application.NewApplicationImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -150,9 +150,9 @@ func (handler *Handler) GetApplicationMetadata(ctx echo.Context, name string) er
 }
 
 func (handler *Handler) GetApplicationPods(ctx echo.Context, name string) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
-	appImpl, err := application.NewApplicationImpl(bearerToken, userId)
+	appImpl, err := application.NewApplicationImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -164,9 +164,9 @@ func (handler *Handler) GetApplicationPods(ctx echo.Context, name string) error 
 }
 
 func (handler *Handler) GetApplicationServices(ctx echo.Context, name string) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
-	appImpl, err := application.NewApplicationImpl(bearerToken, userId)
+	appImpl, err := application.NewApplicationImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -178,9 +178,9 @@ func (handler *Handler) GetApplicationServices(ctx echo.Context, name string) er
 }
 
 func (handler *Handler) GetApplicationNotes(ctx echo.Context, name string) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
-	appImpl, err := application.NewApplicationImpl(bearerToken, userId)
+	appImpl, err := application.NewApplicationImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package billingclient provides billingclient.
 package billingclient
 
 import (
@@ -36,11 +37,11 @@ func GetBillingClient(billingServerURL string) (*apigen.Client, error) {
 func InitUserBillingAccount(client *apigen.Client, userID string, internalURL string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	callbackUrl := internalURL + "/internal-api/releases?user=" + userID
+	callbackURL := internalURL + "/internal-api/releases?user=" + userID
 	// TODO REMOVE
 	initBalance := 1000.0
 
-	params := apigen.PostAccountUseridParams{CallbackUrl: callbackUrl, Balance: &initBalance}
+	params := apigen.PostAccountUseridParams{CallbackUrl: callbackURL, Balance: &initBalance}
 	resp, err := client.PostAccountUserid(ctx, userID, &params)
 	if err != nil {
 		log.Error(err.Error())

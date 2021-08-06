@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
+// Package pvc provides controller for pvc.
 package pvc
 
 import (
-	"github.com/fatih/structs"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
+	"github.com/fatih/structs"
+	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/release"
@@ -46,7 +47,7 @@ type CephSecret struct {
 }
 
 type PvcInfo struct {
-	UserId     string                  `structs:"userId"`
+	UserID     string                  `structs:"userId"`
 	Cephfs     *map[string]interface{} `structs:"cephfs"`
 	Capacity   *Capacity               `structs:"capacity"`
 	CephSecret *CephSecret             `structs:"cephSecret"`

@@ -19,12 +19,12 @@ package handler
 import (
 	"code.cloudfoundry.org/bytefmt"
 	"flag"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -191,7 +191,7 @@ func (handler *Handler) GetStorageDownload(ctx echo.Context, params apigen.GetSt
 	return ctx.Attachment(cPath, fileName)
 }
 
-// create user directory when init user
+// MkUserDir create user directory when init user
 func MkUserDir(userID string) error {
 	if root == nil {
 		return errors.New("flag storage root is not set " + utils.GetRuntimeLocation())

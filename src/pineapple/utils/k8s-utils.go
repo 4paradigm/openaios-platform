@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package utils provides utils.
 package utils
 
 import (
@@ -93,7 +94,7 @@ func CreateNamespace(ctx context.Context, client *kubernetes.Clientset, ns strin
 	return nil
 }
 
-// TODO: check all networking policy
+// CreateNetworkPolicy TODO: check all networking policy
 func CreateNetworkPolicy(ctx context.Context, client *kubernetes.Clientset, ns string) error {
 	networkPolicySpec := &networkingv1.NetworkPolicy{
 		ObjectMeta: metav1.ObjectMeta{

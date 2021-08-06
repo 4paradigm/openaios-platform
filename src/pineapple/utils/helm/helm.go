@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+// Package helm provides utils for helm.
 package helm
 
 import (
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/release"
@@ -40,10 +41,10 @@ type HelmClientImpl struct {
 }
 
 func NewImpl(kubeToken string, namespace string) (*HelmClientImpl, error) {
-	kubeApiServer := conf.GetKubeApiServer()
+	kubeAPIServer := conf.GetKubeAPIServer()
 	kubeCaFile := conf.GetKubeCaFile()
 	config := &genericclioptions.ConfigFlags{
-		APIServer:   &kubeApiServer,
+		APIServer:   &kubeAPIServer,
 		CAFile:      &kubeCaFile,
 		Namespace:   &namespace,
 		BearerToken: &kubeToken,
@@ -65,7 +66,7 @@ func (h *HelmClientImpl) Create(chart *chart.Chart, info IPineappleInfo) (*relea
 		return nil, errors.WithMessage(err, "convert Values to chartValues error: ")
 	}
 	client := action.NewInstall(h.ActionConfig)
-	client.Namespace = info.GetUserId()
+	client.Namespace = info.GetUserID()
 	client.ReleaseName = info.GetPrefix() + info.GetName()
 	postRenderer := NewPostRendererImpl()
 	postRenderer.WriteKustomzation(".", `
@@ -112,7 +113,7 @@ func (h *HelmClientImpl) DeleteListWithKeepHistory(releases []*release.Release, 
 	client := action.NewUninstall(h.ActionConfig)
 	client.KeepHistory = true
 	client.Description = description
-	for i, _ := range releases {
+	for i := range releases {
 		_, err := client.Run(releases[i].Name)
 		if err != nil {
 			errMsg := "Error happened when delete: " + releases[i].Name + ": "

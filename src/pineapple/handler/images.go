@@ -18,13 +18,13 @@ package handler
 
 import (
 	"code.cloudfoundry.org/bytefmt"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
+	"github.com/pkg/errors"
 	"math"
 	"net/http"
 	"path/filepath"
@@ -54,7 +54,7 @@ func (handler *Handler) ListImportingImages(ctx echo.Context) error {
 		}
 		registry := apigen.ImageRegistryInfo{Id: &policy.SrcRegistry.ID,
 			Url: &policy.SrcRegistry.URL}
-		importingId := apigen.ImageImportingId(policy.ID)
+		importingID := apigen.ImageImportingId(policy.ID)
 		var imageRepo apigen.ImageRepo
 		var imageTag apigen.ImageTag
 		for _, filter := range policy.Filters {
@@ -89,7 +89,7 @@ func (handler *Handler) ListImportingImages(ctx echo.Context) error {
 		// TODO: currently one policy contains only one execution
 
 		importingInfo := apigen.ImageImportingInfo{
-			ImportingId: &importingId,
+			ImportingId: &importingID,
 			Registry:    &registry,
 			Status:      &status,
 			Repo:        &imageRepo,
@@ -494,12 +494,12 @@ func CreateHarborUser(userID string) error {
 
 	// create user secret in k8s namespace
 	// TODO: Maybe k8s can use robot account
-	harborUrl, _, _ := conf.GetHarborAddress()
+	harborURL, _, _ := conf.GetHarborAddress()
 	kubeClient, err := utils.GetKubernetesClient()
 	if err != nil {
 		return errors.Wrap(err, "cannot get kubenetes client. "+utils.GetRuntimeLocation())
 	}
-	err = utils.CreateK8sDockerRegistrySecret(kubeClient, userID, harborUrl, userID, password)
+	err = utils.CreateK8sDockerRegistrySecret(kubeClient, userID, harborURL, userID, password)
 	if err != nil && !strings.Contains(err.Error(), "already exists") {
 		return errors.Wrap(err, "create user secret failed "+utils.GetRuntimeLocation())
 	}
@@ -546,38 +546,38 @@ func CreateHarborUser(userID string) error {
 	return nil
 }
 
-func RepoToURL(config apigen.ImageConfig, userId string) (string, error) {
-	harborUrl, _, _ := conf.GetHarborAddress()
-	if harborUrl == "" {
+func RepoToURL(config apigen.ImageConfig, userID string) (string, error) {
+	harborURL, _, _ := conf.GetHarborAddress()
+	if harborURL == "" {
 		return "", errors.New("harbor url is empty " + utils.GetRuntimeLocation())
 	}
 	if config.Source == nil || config.Repo == nil {
 		return "", errors.New("ImageConfig has empty attribute " + utils.GetRuntimeLocation())
 	}
 	if *config.Source == SourcePublic {
-		return filepath.Join(harborUrl, "public", *config.Repo), nil
+		return filepath.Join(harborURL, "public", *config.Repo), nil
 	} else if *config.Source == SourcePrivate {
-		return filepath.Join(harborUrl, userId, *config.Repo), nil
+		return filepath.Join(harborURL, userID, *config.Repo), nil
 	} else {
 		return "", errors.New("ImageConfig source is invalid " + utils.GetRuntimeLocation())
 	}
 }
 
-func URLToRepo(url string, userId string, tag string) (*apigen.ImageConfig, error) {
-	harborUrl, _, _ := conf.GetHarborAddress()
-	if harborUrl == "" {
+func URLToRepo(url string, userID string, tag string) (*apigen.ImageConfig, error) {
+	harborURL, _, _ := conf.GetHarborAddress()
+	if harborURL == "" {
 		return nil, errors.New("harbor url is empty " + utils.GetRuntimeLocation())
 	}
-	if strings.HasPrefix(url, harborUrl) {
-		url = strings.TrimPrefix(url, harborUrl+"/")
+	if strings.HasPrefix(url, harborURL) {
+		url = strings.TrimPrefix(url, harborURL+"/")
 	} else {
 		return nil, errors.New("harbor registry is wrong " + utils.GetRuntimeLocation())
 	}
 	if strings.HasPrefix(url, SourcePublic) {
 		url = strings.TrimPrefix(url, "public/")
 		return &apigen.ImageConfig{Repo: &url, Source: &SourcePublic, Tag: &tag}, nil
-	} else if strings.HasPrefix(url, userId) {
-		url = strings.TrimPrefix(url, userId+"/")
+	} else if strings.HasPrefix(url, userID) {
+		url = strings.TrimPrefix(url, userID+"/")
 		return &apigen.ImageConfig{Repo: &url, Source: &SourcePrivate, Tag: &tag}, nil
 	} else {
 		return nil, errors.New("project name is wrong " + utils.GetRuntimeLocation())

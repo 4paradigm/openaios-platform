@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	keycloakUrl = flag.String("keycloak-url", os.Getenv("PINEAPPLE_OIDC_KEYCLOAK_URL"),
+	keycloakURL = flag.String("keycloak-url", os.Getenv("PINEAPPLE_OIDC_KEYCLOAK_URL"),
 		"oidc keycloak url like https://keycloak.pineapple.com:32443/auth/realms/develop")
 	clientID = flag.String("oidc-client-id", os.Getenv("PINEAPPLE_OIDC_CLIENT_ID"),
 		"oidc client id")
@@ -41,14 +41,14 @@ type IDTokenClaim struct {
 }
 
 func InitAuth() error {
-	if *keycloakUrl == "" {
-		return errors.New("flag to variable keycloakUrl is not set")
+	if *keycloakURL == "" {
+		return errors.New("flag to variable keycloakURL is not set")
 	}
 	if *clientID == "" {
 		return errors.New("flag to variable clientID is not set")
 	}
 
-	provider, err := oidc.NewProvider(context.TODO(), *keycloakUrl)
+	provider, err := oidc.NewProvider(context.TODO(), *keycloakURL)
 	if err != nil {
 		return err
 	}

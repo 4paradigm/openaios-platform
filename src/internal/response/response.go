@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package response provides webserver's response.
 package response
 
 import (
@@ -38,7 +39,7 @@ func BadRequestWithMessagef(c echo.Context, format string, args ...interface{}) 
 	})
 }
 
-func BadRequestWithMessageWithJson(c echo.Context, message string, content interface{}) error {
+func BadRequestWithMessageWithJSON(c echo.Context, message string, content interface{}) error {
 	return c.JSON(http.StatusBadRequest, map[string]interface{}{
 		"message": message,
 		"type":    "json",

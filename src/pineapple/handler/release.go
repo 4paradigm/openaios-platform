@@ -17,13 +17,13 @@
 package handler
 
 import (
-	"github.com/labstack/echo/v4"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen/internalapigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/controller/application"
 	"github.com/4paradigm/openaios-platform/src/pineapple/controller/environment"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
+	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
@@ -31,12 +31,12 @@ func (handler *Handler) DeleteReleases(ctx echo.Context, params internalapigen.D
 	if params.User == nil {
 		return response.BadRequestWithMessagef(ctx, "request query user")
 	}
-	userId := *params.User
+	userID := *params.User
 	bearerToken, err := conf.GetKubeToken()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
-	helmImpl, err := helm.NewImpl(bearerToken, userId)
+	helmImpl, err := helm.NewImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}

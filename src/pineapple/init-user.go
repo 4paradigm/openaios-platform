@@ -19,13 +19,13 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/billingclient"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/controller/pvc"
 	"github.com/4paradigm/openaios-platform/src/pineapple/handler"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"k8s.io/client-go/kubernetes"
@@ -55,16 +55,16 @@ func kubernetesUserInitialize(ctx context.Context, client *kubernetes.Clientset,
 }
 
 func userStoragePvcInit(ctx echo.Context) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken, err := conf.GetKubeToken()
 	if err != nil {
 		return errors.WithMessage(err, "GetKubeToken error: ")
 	}
-	pvcImpl, err := pvc.NewPvcImpl(bearerToken, userId)
+	pvcImpl, err := pvc.NewPvcImpl(bearerToken, userID)
 	if err != nil {
 		return errors.WithMessage(err, "NewPvcImpl error: ")
 	}
-	pvcInfo, err := parseUserStorageConfigToPvcInfo(userId)
+	pvcInfo, err := parseUserStorageConfigToPvcInfo(userID)
 	if err != nil {
 		return errors.WithMessage(err, "parseUserStorageConfigToPvcInfo error: ")
 	}
@@ -75,7 +75,7 @@ func userStoragePvcInit(ctx echo.Context) error {
 	return nil
 }
 
-func parseUserStorageConfigToPvcInfo(userId string) (*pvc.PvcInfo, error) {
+func parseUserStorageConfigToPvcInfo(userID string) (*pvc.PvcInfo, error) {
 
 	storageQuota, err := strconv.ParseInt(conf.GetUserStorageQuotaBytes(), 10, 64)
 	if err != nil {
@@ -102,10 +102,10 @@ func parseUserStorageConfigToPvcInfo(userId string) (*pvc.PvcInfo, error) {
 		return nil, errors.Wrap(err, "Unmarshal error: "+utils.GetRuntimeLocation())
 	}
 
-	(*cephInfo)["path"] = (*cephInfo)["path"].(string) + "/" + userId
+	(*cephInfo)["path"] = (*cephInfo)["path"].(string) + "/" + userID
 
 	pvcInfo := pvc.PvcInfo{
-		UserId: userId,
+		UserID: userID,
 		Cephfs: cephInfo,
 		Capacity: &pvc.Capacity{
 			Storage: strconv.FormatInt(storageQuota, 10) + "Gi",

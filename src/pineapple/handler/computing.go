@@ -17,24 +17,24 @@
 package handler
 
 import (
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/billingclient"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"net/http"
 )
 
 func (handler *Handler) GetComputingUnitSpecs(ctx echo.Context) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	billingClient, err := billingclient.GetBillingClient(conf.GetBillingServerURL())
 	if err != nil {
 		return echo.NewHTTPError(
 			http.StatusInternalServerError, "cannot connect to billing server").SetInternal(
 			errors.Wrap(err, utils.GetRuntimeLocation()))
 	}
-	computeunitInfos, err := billingclient.GetComputeUnitListByUserID(billingClient, userId)
+	computeunitInfos, err := billingclient.GetComputeUnitListByUserID(billingClient, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}

@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
+// Package mongodb provides mongodb.
 package mongodb
 
 import (
 	"context"
+	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/labstack/gommon/log"
 	"github.com/pkg/errors"
-	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -158,7 +159,7 @@ func DeleteOneDocument(client *mongo.Client, database string,
 	return err
 }
 
-// warning: one operator only appear once
+// UpdateOneDocument warning: one operator only appear once
 // return modify_count
 func UpdateOneDocument(client *mongo.Client, database string, collection string,
 	uniqueKey interface{}, operations ...MongodbOperation) (int64, error) {
@@ -191,7 +192,7 @@ func FindOneDocument(client *mongo.Client, database string,
 	return db.FindOne(ctx, uniqueKey)
 }
 
-// warning: only support single key
+// FindDocuments warning: only support single key
 func FindDocuments(client *mongo.Client, database string, collection string,
 	key string, operators ...ComparisonQueryOperator) (*mongo.Cursor, error) {
 	if client == nil {
@@ -222,7 +223,7 @@ func FindDocumentsByMultiKey(client *mongo.Client, database string, collection s
 	return db.Find(ctx, bson.M{condition: keys})
 }
 
-// warning: different operations cannot have same operator
+// UpdateOrInsertOneDocument warning: different operations cannot have same operator
 func UpdateOrInsertOneDocument(client *mongo.Client, database string, collection string,
 	uniqueKey interface{}, operations ...MongodbOperation) error {
 	if client == nil {
@@ -239,8 +240,8 @@ func UpdateOrInsertOneDocument(client *mongo.Client, database string, collection
 	return err
 }
 
-func InsertedIdToObjectId(insertedId interface{}) (string, error) {
-	if oid, ok := insertedId.(primitive.ObjectID); ok {
+func InsertedIDToObjectID(insertedID interface{}) (string, error) {
+	if oid, ok := insertedID.(primitive.ObjectID); ok {
 		return oid.Hex(), nil
 	} else {
 		return "", errors.New("Cannot convert inserted id to object id.")

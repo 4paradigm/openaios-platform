@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package environment provides controller for environment.
 package environment
 
 import (
@@ -21,11 +22,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
+	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/api/core/v1"
@@ -38,7 +39,7 @@ import (
 )
 
 var (
-	envSshUrl = flag.String("env-sshurl", os.Getenv("PINEAPPLE_ENV_SSHURL"),
+	envSSHURL = flag.String("env-sshurl", os.Getenv("PINEAPPLE_ENV_SSHURL"),
 		"env-sshurl")
 )
 
@@ -82,7 +83,7 @@ func (e *EnvironmentImpl) GetInfoList(limit int, offset int) (*EnvironmentReleas
 	if err != nil {
 		return nil, err
 	}
-	envSshInfos, err := e.getSshInfoList()
+	envSSHInfos, err := e.getSSHInfoList()
 	if err != nil {
 		return nil, err
 	}
@@ -93,9 +94,9 @@ func (e *EnvironmentImpl) GetInfoList(limit int, offset int) (*EnvironmentReleas
 		envReleaseInfos[i].StaticInfo = envRuntimeStaticInfos[i]
 		releaseName := envReleaseInfos[i].StaticInfo.Name
 		if envPodInfos[*releaseName] == nil {
-			state := EnvironmentState_Unknown
+			state := EnvironmentStateUnknown
 			if *envRuntimeStaticInfos[i].Description == "ran out of credit" {
-				state = EnvironmentState_Killed
+				state = EnvironmentStateKilled
 			}
 			envReleaseInfos[i].State = &state
 			envReleaseInfos[i].PodName = ""
@@ -105,13 +106,13 @@ func (e *EnvironmentImpl) GetInfoList(limit int, offset int) (*EnvironmentReleas
 			envReleaseInfos[i].PodName = *envPodInfos[*releaseName].PodName
 			envReleaseInfos[i].Events = envPodInfos[*releaseName].Events
 		}
-		envReleaseInfos[i].SshInfo = envSshInfos[*releaseName]
+		envReleaseInfos[i].SSHInfo = envSSHInfos[*releaseName]
 		envReleaseInfos[i].ReleaseName = *releaseName
 		envReleaseInfos[i].Type = "environment"
 		*envReleaseInfos[i].StaticInfo.Name = (*releaseName)[len(EnvPrefix):]
 		//if envReleaseInfos[i].State == nil {
 		//	envReleaseInfos[i].State = new(EnvironmentState)
-		//	*envReleaseInfos[i].State = EnvironmentState_Unknown
+		//	*envReleaseInfos[i].State = EnvironmentStateUnknown
 		//}
 	}
 
@@ -140,7 +141,7 @@ func (e *EnvironmentImpl) GetInfo(name string) (*EnvironmentReleaseInfo, error) 
 	}
 	if len(*pods) == 0 {
 		envReleaseInfo.PodName = ""
-		*envReleaseInfo.State = EnvironmentState_Killed
+		*envReleaseInfo.State = EnvironmentStateKilled
 		envReleaseInfo.Events = nil
 	} else {
 		envReleaseInfo.PodName = (*pods)[0].Name
@@ -157,7 +158,7 @@ func (e *EnvironmentImpl) GetInfo(name string) (*EnvironmentReleaseInfo, error) 
 		envReleaseInfo.Events = &eventInfos
 	}
 
-	envReleaseInfo.SshInfo, err = e.getSshInfo(releaseName)
+	envReleaseInfo.SSHInfo, err = e.getSSHInfo(releaseName)
 	if err != nil {
 		return envReleaseInfo, err
 	}
@@ -230,7 +231,7 @@ func (e *EnvironmentImpl) getEnvironmentRuntimeStaticInfoFromRelease(release *re
 
 	}
 	*envRuntimeStaticInfo.CreateTm = release.Info.FirstDeployed
-	*envRuntimeStaticInfo.NotebookUrl = conf.GetExternalURL() + *envRuntimeStaticInfo.NotebookUrl
+	*envRuntimeStaticInfo.NotebookURL = conf.GetExternalURL() + *envRuntimeStaticInfo.NotebookURL
 	envRuntimeStaticInfo.Description = new(string)
 	*envRuntimeStaticInfo.Description = release.Info.Description
 	return envRuntimeStaticInfo, nil
@@ -316,7 +317,7 @@ func translateTimestampSince(timestamp metav1.Time) string {
 	return duration.HumanDuration(time.Since(timestamp.Time))
 }
 
-func (e *EnvironmentImpl) getSshInfoList() (map[string]*EnvironmentRuntimeSshInfo, error) {
+func (e *EnvironmentImpl) getSSHInfoList() (map[string]*EnvironmentRuntimeSSHInfo, error) {
 	client, err := utils.GetKubernetesClient()
 	if err != nil {
 		return nil, errors.WithMessage(err, "GetKubernetesClient error: ")
@@ -328,20 +329,20 @@ func (e *EnvironmentImpl) getSshInfoList() (map[string]*EnvironmentRuntimeSshInf
 	if err != nil {
 		return nil, errors.Wrap(err, "ssh service list error: "+utils.GetRuntimeLocation())
 	}
-	var envSshList = map[string]*EnvironmentRuntimeSshInfo{}
-	envSshList = make(map[string]*EnvironmentRuntimeSshInfo)
+	var envSSHList = map[string]*EnvironmentRuntimeSSHInfo{}
+	envSSHList = make(map[string]*EnvironmentRuntimeSSHInfo)
 	for _, svc := range services.Items {
 		port := strconv.Itoa(int(svc.Spec.Ports[0].NodePort))
-		envSshList[svc.Labels["name"]] = new(EnvironmentRuntimeSshInfo)
-		*envSshList[svc.Labels["name"]] = EnvironmentRuntimeSshInfo{
-			SshIp:   envSshUrl,
-			SshPort: &port,
+		envSSHList[svc.Labels["name"]] = new(EnvironmentRuntimeSSHInfo)
+		*envSSHList[svc.Labels["name"]] = EnvironmentRuntimeSSHInfo{
+			SSHIP:   envSSHURL,
+			SSHPort: &port,
 		}
 	}
-	return envSshList, nil
+	return envSSHList, nil
 }
 
-func (e *EnvironmentImpl) getSshInfo(releaseName string) (*EnvironmentRuntimeSshInfo, error) {
+func (e *EnvironmentImpl) getSSHInfo(releaseName string) (*EnvironmentRuntimeSSHInfo, error) {
 	client, err := utils.GetKubernetesClient()
 	if err != nil {
 		return nil, errors.WithMessage(err, "GetKubernetesClient error: ")
@@ -357,11 +358,11 @@ func (e *EnvironmentImpl) getSshInfo(releaseName string) (*EnvironmentRuntimeSsh
 		return nil, nil
 	}
 	port := strconv.Itoa(int(services.Items[0].Spec.Ports[0].NodePort))
-	envRuntimeSshInfo := EnvironmentRuntimeSshInfo{
-		SshIp:   envSshUrl,
-		SshPort: &port,
+	envRuntimeSSHInfo := EnvironmentRuntimeSSHInfo{
+		SSHIP:   envSSHURL,
+		SSHPort: &port,
 	}
-	return &envRuntimeSshInfo, nil
+	return &envRuntimeSSHInfo, nil
 }
 
 //func (e *EnvironmentImpl) GetExistEnvNames() ([]string, error) {

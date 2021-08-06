@@ -19,14 +19,14 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/billingclient"
 	"github.com/4paradigm/openaios-platform/src/internal/mongodb"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -53,7 +53,7 @@ var mongodbCompetitionsColl = "competitions"
 
 func (handler *Handler) GetCompetitionCompetitionID(ctx echo.Context, competitionID string) error {
 	userID := ctx.Get("userID").(string)
-	mongodbURL := conf.GetmongodbURL()
+	mongodbURL := conf.GetMongodbURL()
 	database := conf.GetMongodbDatabase()
 	client, err := mongodb.GetMongodbClient(mongodbURL)
 	if err != nil {
@@ -79,7 +79,7 @@ func (handler *Handler) GetCompetitionCompetitionID(ctx echo.Context, competitio
 func (handler *Handler) PostCompetitionCompetitionID(ctx echo.Context, competitionID string,
 	params apigen.PostCompetitionCompetitionIDParams) error {
 	userID := ctx.Get("userID").(string)
-	mongodbURL := conf.GetmongodbURL()
+	mongodbURL := conf.GetMongodbURL()
 	database := conf.GetMongodbDatabase()
 	client, err := mongodb.GetMongodbClient(mongodbURL)
 	if err != nil {
@@ -161,7 +161,7 @@ func (handler *Handler) PostCompetitionCompetitionID(ctx echo.Context, competiti
 }
 
 func (handler *Handler) GetCompetition(ctx echo.Context, params apigen.GetCompetitionParams) error {
-	mongodbURL := conf.GetmongodbURL()
+	mongodbURL := conf.GetMongodbURL()
 	database := conf.GetMongodbDatabase()
 	client, err := mongodb.GetMongodbClient(mongodbURL)
 	if err != nil {
@@ -232,7 +232,7 @@ func (handler *Handler) GetCompetition(ctx echo.Context, params apigen.GetCompet
 }
 
 func (handler *Handler) GetCompetitionCompetitionIDInvitation(ctx echo.Context, competitionID string) error {
-	mongodbURL := conf.GetmongodbURL()
+	mongodbURL := conf.GetMongodbURL()
 	database := conf.GetMongodbDatabase()
 	client, err := mongodb.GetMongodbClient(mongodbURL)
 	if err != nil {

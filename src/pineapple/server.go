@@ -19,15 +19,15 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/labstack/echo-contrib/prometheus"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/labstack/gommon/log"
 	"github.com/4paradigm/openaios-platform/src/internal/auth"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen/internalapigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/handler"
+	"github.com/labstack/echo-contrib/prometheus"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
 	"net/http"
 	"os"
 )
@@ -91,8 +91,8 @@ func main() {
 	apiGroup.GET("/userinfo", h.UserInfo)
 	apigen.RegisterHandlers(apiGroup, &h)
 
-	internalApiGroup := e.Group("/internal-api")
-	internalapigen.RegisterHandlers(internalApiGroup, &h)
+	internalAPIGroup := e.Group("/internal-api")
+	internalapigen.RegisterHandlers(internalAPIGroup, &h)
 
 	e.Logger.Info(e.Start("0.0.0.0:80"))
 }

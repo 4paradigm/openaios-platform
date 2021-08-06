@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package conf provides conf for pineapple.
 package conf
 
 import (
@@ -36,7 +37,7 @@ var (
 		"external-tls")
 	internalURL = flag.String("internal-url", os.Getenv("PINEAPPLE_INTERNAL_URL"),
 		"internal-url")
-	kubeApiServer = flag.String("kube-apiserver", getKubeApiServer(),
+	kubeAPIServer = flag.String("kube-apiserver", getKubeAPIServer(),
 		"kube-apiserver")
 	kubeCaFile = flag.String("kube-cafile", getKubeCaFile(),
 		"kube-cafile")
@@ -44,7 +45,7 @@ var (
 		"kube-token")
 	userStorageQuotaBytes = flag.String("storage-user-quota", os.Getenv("PINEAPPLE_STORAGE_USER_QUOTA"),
 		"set user directory quota")
-	billingServerUrl = flag.String("billing-server-url", os.Getenv("PINEAPPLE_BILLING_SERVER_URL"),
+	billingServerURL = flag.String("billing-server-url", os.Getenv("PINEAPPLE_BILLING_SERVER_URL"),
 		"billing server url")
 	harborURL = flag.String("images-harbor-url", os.Getenv("PINEAPPLE_HARBOR_URL"),
 		"harbor url")
@@ -84,8 +85,8 @@ func GetInternalURL() string {
 	return *internalURL
 }
 
-func GetKubeApiServer() string {
-	return *kubeApiServer
+func GetKubeAPIServer() string {
+	return *kubeAPIServer
 }
 
 func GetKubeCaFile() string {
@@ -104,7 +105,7 @@ func GetUserStorageQuotaBytes() string {
 }
 
 func GetBillingServerURL() string {
-	return *billingServerUrl
+	return *billingServerURL
 }
 
 func GetHarborURL() (string) {
@@ -156,7 +157,7 @@ func GetAppConf() (map[string]interface{}, error) {
 	return appConf, nil
 }
 
-func getKubeApiServer() string {
+func getKubeAPIServer() string {
 	if os.Getenv("PINEAPPLE_ENV_KUBEAPISERVER") != "" {
 		return os.Getenv("PINEAPPLE_ENV_KUBEAPISERVER")
 	}
@@ -177,7 +178,7 @@ func getKubeTokenFile() string {
 	return "/var/run/secrets/kubernetes.io/serviceaccount/token"
 }
 
-func GetmongodbURL() string {
+func GetMongodbURL() string {
 	return *mongodbURL
 }
 

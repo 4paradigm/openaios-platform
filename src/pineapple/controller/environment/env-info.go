@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
+// Package environment provides controller for environment.
 package environment
 
 import (
-	"github.com/fatih/structs"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/handler/models"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
+	"github.com/fatih/structs"
 )
 
 type EnvironmentInfo struct {
 	*helm.PineappleInfo
 	Image        models.ImageInfo
 	ServerType   ServerType
-	SshKey       string
+	SSHKey       string
 	JupyterToken string
 	PvcClaimName string
 	VolumeMounts models.VolumeMounts
-	ResourceId   string
+	ResourceID   string
 }
 
 func (e *EnvironmentInfo) CreateEnvValues() (map[string]interface{}, error) {
@@ -40,7 +41,7 @@ func (e *EnvironmentInfo) CreateEnvValues() (map[string]interface{}, error) {
 
 	envValues["serverType"] = structs.Map(e.ServerType)
 	envValues["ssh"] = map[string]string{
-		"sshKey": e.SshKey,
+		"sshKey": e.SSHKey,
 	}
 	envValues["jupyter"] = map[string]string{
 		"token": e.JupyterToken,
@@ -57,7 +58,7 @@ func (e *EnvironmentInfo) CreateEnvValues() (map[string]interface{}, error) {
 	envValues["pineapple"] = map[string]interface{}{
 		"belongTo": "user",
 		"default": map[string]interface{}{
-			"resourceId": e.ResourceId,
+			"resourceId": e.ResourceID,
 		},
 	}
 

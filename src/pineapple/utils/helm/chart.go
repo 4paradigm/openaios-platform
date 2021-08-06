@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
+// Package helm provides utils for helm.
 package helm
 
 import (
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"net/http"
 )
 
 func DownloadChart(url string) (*chart.Chart, error) {
-	realUrl, err := getChartrepoUrl(url)
+	realURL, err := getChartrepoURL(url)
 	if err != nil {
-		return nil, errors.Wrap(err, "getChartrepoUrl url error: "+utils.GetRuntimeLocation())
+		return nil, errors.Wrap(err, "getChartrepoURL url error: "+utils.GetRuntimeLocation())
 	}
 	client := new(http.Client)
-	request, err := http.NewRequest("GET", realUrl, nil)
+	request, err := http.NewRequest("GET", realURL, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "NewRequest error: "+utils.GetRuntimeLocation())
 	}
@@ -50,12 +51,12 @@ func DownloadChart(url string) (*chart.Chart, error) {
 }
 
 func DownloadChartFiles(url string) ([]*chart.File, error) {
-	realUrl, err := getChartrepoUrl(url)
+	realURL, err := getChartrepoURL(url)
 	if err != nil {
-		return nil, errors.Wrap(err, "getChartrepoUrl url error: "+utils.GetRuntimeLocation())
+		return nil, errors.Wrap(err, "getChartrepoURL url error: "+utils.GetRuntimeLocation())
 	}
 	client := new(http.Client)
-	request, err := http.NewRequest("GET", realUrl, nil)
+	request, err := http.NewRequest("GET", realURL, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "NewRequest error: "+utils.GetRuntimeLocation())
 	}
@@ -86,12 +87,12 @@ func expandCharts(bufferedFiles []*loader.BufferedFile) ([]*chart.File, error) {
 	return files, nil
 }
 
-func getChartrepoUrl(url string) (string, error) {
-	// harborUrl, _, _ := conf.GetHarborAddress()
-	harborUrl := conf.GetHarborURL()
-	if harborUrl == "" {
+func getChartrepoURL(url string) (string, error) {
+	// harborURL, _, _ := conf.GetHarborAddress()
+	harborURL := conf.GetHarborURL()
+	if harborURL == "" {
 		return "", errors.New("harbor url is empty: " + utils.GetRuntimeLocation())
 	}
-	realUrl := harborUrl + "/" + url
-	return realUrl, nil
+	realURL := harborURL + "/" + url
+	return realURL, nil
 }

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
+// Package helm provides utils for helm.
 package helm
 
 import (
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 )
 

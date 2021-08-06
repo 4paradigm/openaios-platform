@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
+// Package helm provides utils for helm.
 package helm
 
 import (
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/billingclient"
 	"github.com/4paradigm/openaios-platform/src/pineapple/conf"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/pkg/errors"
 )
 
 type IPineappleInfo interface {
 	SetValues(values map[string]interface{})
 	GetName() string
-	GetUserId() string
+	GetUserID() string
 	GetPrefix() string
 	GetValues() map[string]interface{}
 	CreateChartValues() (map[string]interface{}, error)
@@ -34,17 +35,17 @@ type IPineappleInfo interface {
 
 type PineappleInfo struct {
 	Name   string
-	UserId string
+	UserID string
 	Prefix string
 	Values map[string]interface{}
 }
 
-func NewPineappleInfo(name string, userId string, prefix string) (*PineappleInfo, error) {
+func NewPineappleInfo(name string, userID string, prefix string) (*PineappleInfo, error) {
 	billingClient, err := billingclient.GetBillingClient(conf.GetBillingServerURL())
 	if err != nil {
 		return nil, errors.Wrap(err, utils.GetRuntimeLocation())
 	}
-	userBalance, err := billingclient.GetUserBalance(billingClient, userId)
+	userBalance, err := billingclient.GetUserBalance(billingClient, userID)
 	if err != nil {
 		return nil, errors.WithMessage(err, "get GetUserBalance error: ")
 	}
@@ -53,7 +54,7 @@ func NewPineappleInfo(name string, userId string, prefix string) (*PineappleInfo
 	}
 	pineappleInfo := PineappleInfo{
 		Name:   name,
-		UserId: userId,
+		UserID: userID,
 		Prefix: prefix,
 		Values: nil,
 	}
@@ -64,8 +65,8 @@ func (p *PineappleInfo) GetName() string {
 	return p.Name
 }
 
-func (p *PineappleInfo) GetUserId() string {
-	return p.UserId
+func (p *PineappleInfo) GetUserID() string {
+	return p.UserID
 }
 
 func (p *PineappleInfo) GetPrefix() string {
@@ -81,8 +82,7 @@ func (p *PineappleInfo) SetValues(values map[string]interface{}) {
 }
 
 func (p *PineappleInfo) CreateChartValues() (map[string]interface{}, error) {
-	var chartValues map[string]interface{}
-	chartValues = p.Values
+	var chartValues = p.Values
 
 	// Create appConf Values
 	appConf, err := conf.GetAppConf()

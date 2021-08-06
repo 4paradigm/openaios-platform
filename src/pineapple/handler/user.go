@@ -18,8 +18,6 @@ package handler
 
 import (
 	"encoding/json"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/billingclient"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
@@ -27,6 +25,8 @@ import (
 	"github.com/4paradigm/openaios-platform/src/pineapple/controller/application"
 	"github.com/4paradigm/openaios-platform/src/pineapple/controller/environment"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"net/http"
 )
 
@@ -130,14 +130,14 @@ func (handler *Handler) GetUserTasks(c echo.Context) error {
 			errors.Wrap(err, utils.GetRuntimeLocation()))
 	}
 	for k, v := range computeUnitMap {
-		var computeUnitId = apigen.ComputeUnitId(k)
+		var computeUnitID = apigen.ComputeUnitId(k)
 		var computeUnitNum = v
 		price, err := billingclient.GetComputeUnitPrice(billingClient, k)
 		if err != nil {
 			c.Logger().Warn(errors.Wrap(err, "get computeunit price failed "+utils.GetRuntimeLocation()))
 		}
 		computeUnitList = append(computeUnitList,
-			apigen.UserTaskInfo{ComputeUnit: &computeUnitId, Number: &computeUnitNum, Price: &price})
+			apigen.UserTaskInfo{ComputeUnit: &computeUnitID, Number: &computeUnitNum, Price: &price})
 	}
 	UserTaskInfo := apigen.UserTasksInfo{EnvNum: &envTotal, AppNum: &appTotal, TaskList: &computeUnitList}
 	return c.JSON(http.StatusOK, UserTaskInfo)

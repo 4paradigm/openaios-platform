@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package models provides models.
 package models
 
 type ImageInfo struct {

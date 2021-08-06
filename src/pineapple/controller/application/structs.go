@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package application provides controller for application.
 package application
 
 import (

@@ -47,9 +47,9 @@ func (nF *NamedFile) Name() string {
 }
 
 func (handler *Handler) GetAppstoreChartList(ctx echo.Context) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 
-	privateChartList, err := getChartList(apigen.ChartCategory_private, userId)
+	privateChartList, err := getChartList(apigen.ChartCategory_private, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -107,10 +107,10 @@ func getChartList(category apigen.ChartCategory, repo string) ([]apigen.ChartMet
 }
 
 func (handler *Handler) GetAppstoreChart(ctx echo.Context, category apigen.ChartCategory, name string, version string) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	host, basepath, schemes := conf.GetHarborV1Address()
 	client := utils.GetHarborClient(host, basepath, schemes)
-	repo := userId
+	repo := userID
 	if category != apigen.ChartCategory_private {
 		repo = string(category)
 	}
@@ -223,6 +223,9 @@ func parseZipToTgz(file *multipart.FileHeader) (string, error) {
 	defer tw.Close()
 
 	zr, err := zip.NewReader(zipFile, file.Size)
+	if err != nil {
+		return "", errors.Wrap(err, "NewReader error: "+utils.GetRuntimeLocation())
+	}
 	for _, f := range zr.File {
 		rc, err := f.Open()
 		if err != nil {

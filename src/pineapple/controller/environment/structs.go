@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+// Package environment provides controller for environment.
 package environment
 
 import (
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
+	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/time"
 )
 
@@ -29,23 +30,23 @@ const (
 
 type ServerType struct {
 	Jupyter string `json:"jupyter" structs:"jupyter"`
-	Ssh     string `json:"ssh" structs:"ssh"`
+	SSH     string `json:"ssh" structs:"ssh"`
 }
 
 type EnvironmentState string
 
 const (
-	EnvironmentState_Failed    EnvironmentState = "Failed"
-	EnvironmentState_Pending   EnvironmentState = "Pending"
-	EnvironmentState_Running   EnvironmentState = "Running"
-	EnvironmentState_Succeeded EnvironmentState = "Succeeded"
-	EnvironmentState_Unknown   EnvironmentState = "Unknown"
-	EnvironmentState_Killed    EnvironmentState = "Killed"
+	EnvironmentStateFailed    EnvironmentState = "Failed"
+	EnvironmentStatePending   EnvironmentState = "Pending"
+	EnvironmentStateRunning   EnvironmentState = "Running"
+	EnvironmentStateSucceeded EnvironmentState = "Succeeded"
+	EnvironmentStateUnknown   EnvironmentState = "Unknown"
+	EnvironmentStateKilled    EnvironmentState = "Killed"
 )
 
-type EnvironmentRuntimeSshInfo struct {
-	SshIp   *string `json:"ssh_ip,omitempty"`
-	SshPort *string `json:"ssh_port,omitempty"`
+type EnvironmentRuntimeSSHInfo struct {
+	SSHIP   *string `json:"ssh_ip,omitempty"`
+	SSHPort *string `json:"ssh_port,omitempty"`
 }
 
 type EnvironmentConfig struct {
@@ -59,7 +60,7 @@ type EnvironmentConfig struct {
 		Token  *string `json:"token,omitempty"`
 	} `json:"jupyter,omitempty"`
 	Mounts *[]apigen.StorageMapping `json:"mounts,omitempty"`
-	Ssh    *struct {
+	SSH    *struct {
 		Enable   *bool   `json:"enable,omitempty"`
 		IdRsaPub *string `json:"id_rsa.pub,omitempty"`
 	} `json:"ssh,omitempty"`
@@ -69,12 +70,12 @@ type EnvironmentRuntimeStaticInfo struct {
 	Name              *string            `json:"name,omitempty"`
 	CreateTm          *time.Time         `json:"create_tm,omitempty"`
 	EnvironmentConfig *EnvironmentConfig `json:"environmentConfig,omitempty"`
-	NotebookUrl       *string            `json:"notebook_url,omitempty"`
+	NotebookURL       *string            `json:"notebook_url,omitempty"`
 	Description       *string            `json:"description,omitempty"`
 }
 
 type EnvironmentReleaseInfo struct {
-	SshInfo     *EnvironmentRuntimeSshInfo         `json:"sshInfo,omitempty"`
+	SSHInfo     *EnvironmentRuntimeSSHInfo         `json:"sshInfo,omitempty"`
 	State       *EnvironmentState                  `json:"state,omitempty"`
 	StaticInfo  *EnvironmentRuntimeStaticInfo      `json:"staticInfo,omitempty"`
 	PodName     string                             `json:"pod_name,omitempty"`

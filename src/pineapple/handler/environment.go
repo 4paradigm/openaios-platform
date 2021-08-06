@@ -18,14 +18,14 @@ package handler
 
 import (
 	"flag"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/controller/environment"
 	"github.com/4paradigm/openaios-platform/src/pineapple/handler/models"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils"
 	"github.com/4paradigm/openaios-platform/src/pineapple/utils/helm"
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"net/http"
@@ -66,7 +66,7 @@ func (handler *Handler) CreateEnvironment(ctx echo.Context, name apigen.Environm
 		return response.BadRequestWithMessagef(ctx, "环境名%s不合法，须符合正则表达式'[a-z]([-a-z0-9]*[a-z0-9])?'", name)
 	}
 
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
 	requestBody := new(apigen.CreateEnvironmentJSONRequestBody)
 	if err := ctx.Bind(requestBody); err != nil {
@@ -74,10 +74,10 @@ func (handler *Handler) CreateEnvironment(ctx echo.Context, name apigen.Environm
 	}
 
 	if requestErr := checkCreateEnvironmentJSONRequestBody(requestBody); requestErr != nil {
-		return response.BadRequestWithMessageWithJson(ctx, requestErr.Error(), requestErr.GetKeyErrors())
+		return response.BadRequestWithMessageWithJSON(ctx, requestErr.Error(), requestErr.GetKeyErrors())
 	}
 
-	envInfo, err := createEnvironmentInfo(requestBody, string(name), userId)
+	envInfo, err := createEnvironmentInfo(requestBody, string(name), userID)
 	if err != nil {
 		if strings.Contains(err.Error(), "User does not have enough balance") {
 			return response.BadRequestWithMessage(ctx, "您的余额不足，无法创建环境")
@@ -85,7 +85,7 @@ func (handler *Handler) CreateEnvironment(ctx echo.Context, name apigen.Environm
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
 
-	envImpl, err := environment.NewEnvironmentImpl(bearerToken, userId)
+	envImpl, err := environment.NewEnvironmentImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -111,7 +111,7 @@ func loadChart(chartDir string) (*chart.Chart, error) {
 	return chart, nil
 }
 
-func createEnvironmentInfo(requestBody *apigen.CreateEnvironmentJSONRequestBody, envName string, userId string) (*environment.EnvironmentInfo, error) {
+func createEnvironmentInfo(requestBody *apigen.CreateEnvironmentJSONRequestBody, envName string, userID string) (*environment.EnvironmentInfo, error) {
 
 	volumeMounts := models.VolumeMounts{}
 	if *requestBody.Mounts != nil {
@@ -124,7 +124,7 @@ func createEnvironmentInfo(requestBody *apigen.CreateEnvironmentJSONRequestBody,
 		}
 	}
 
-	imageRepository, err := RepoToURL(*requestBody.Image, userId)
+	imageRepository, err := RepoToURL(*requestBody.Image, userID)
 	if err != nil {
 		requestBodyError := new(RequestBodyError)
 		requestBodyError.keyErrors = make(map[string]string)
@@ -132,7 +132,7 @@ func createEnvironmentInfo(requestBody *apigen.CreateEnvironmentJSONRequestBody,
 		return nil, requestBodyError
 	}
 
-	pineappleInfo, err := helm.NewPineappleInfo(envName, userId, environment.EnvPrefix)
+	pineappleInfo, err := helm.NewPineappleInfo(envName, userID, environment.EnvPrefix)
 	if err != nil {
 		return nil, err
 	}
@@ -146,13 +146,13 @@ func createEnvironmentInfo(requestBody *apigen.CreateEnvironmentJSONRequestBody,
 		},
 		ServerType: environment.ServerType{
 			Jupyter: strings.Title(strconv.FormatBool(*requestBody.Jupyter.Enable)),
-			Ssh:     strings.Title(strconv.FormatBool(*requestBody.Ssh.Enable)),
+			SSH:     strings.Title(strconv.FormatBool(*requestBody.Ssh.Enable)),
 		},
-		SshKey:       *requestBody.Ssh.IdRsaPub,
+		SSHKey:       *requestBody.Ssh.IdRsaPub,
 		JupyterToken: *requestBody.Jupyter.Token,
 		PvcClaimName: "remote-storage",
 		VolumeMounts: volumeMounts,
-		ResourceId:   string(*requestBody.ComputeUnit),
+		ResourceID:   string(*requestBody.ComputeUnit),
 	}
 
 	values, err := envInfo.CreateEnvValues()
@@ -186,16 +186,11 @@ func checkCreateEnvironmentJSONRequestBody(requestBody *apigen.CreateEnvironment
 	}
 	if requestBody.ComputeUnit == nil {
 		requestBodyError.keyErrors["compute_unit"] = "无效输入"
-	} else {
-		// TODO(fuhao): compute unit
-		//existUnit := false
-		//if !existUnit {
-		//	requestBodyError.keyErrors["compute_unit"] = "无效输入"
-		//}
 	}
+	// TODO(fuhao): compute unit
+
 	if requestBody.Mounts == nil {
 		requestBodyError.keyErrors["mounts"] = "无效输入"
-	} else {
 	}
 	if requestBody.Jupyter == nil {
 		requestBodyError.keyErrors["jupyter"] = "无效输入"
@@ -254,9 +249,9 @@ func checkCreateEnvironmentJSONRequestBody(requestBody *apigen.CreateEnvironment
 }
 
 func (handler *Handler) DeleteEnvironment(ctx echo.Context, name apigen.EnvironmentName) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
-	envImpl, err := environment.NewEnvironmentImpl(bearerToken, userId)
+	envImpl, err := environment.NewEnvironmentImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -267,9 +262,9 @@ func (handler *Handler) DeleteEnvironment(ctx echo.Context, name apigen.Environm
 }
 
 func (handler *Handler) GetEnvironment(ctx echo.Context, name apigen.EnvironmentName) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
-	envImpl, err := environment.NewEnvironmentImpl(bearerToken, userId)
+	envImpl, err := environment.NewEnvironmentImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -278,7 +273,7 @@ func (handler *Handler) GetEnvironment(ctx echo.Context, name apigen.Environment
 		return response.BadRequestWithMessagef(ctx, "环境: %s 获取失败，请重试", name)
 	}
 
-	envInfoResponse, err := parseEnvironmentRuntimeInfoToResponse(envInfo, userId)
+	envInfoResponse, err := parseEnvironmentRuntimeInfoToResponse(envInfo, userID)
 	if err != nil {
 		return response.BadRequestWithMessagef(ctx, "环境: %s 获取失败，请重试", name)
 	}
@@ -286,9 +281,9 @@ func (handler *Handler) GetEnvironment(ctx echo.Context, name apigen.Environment
 }
 
 func (handler *Handler) GetEnvironmentList(ctx echo.Context, params apigen.GetEnvironmentListParams) error {
-	userId := ctx.Get("userID").(string)
+	userID := ctx.Get("userID").(string)
 	bearerToken := ctx.Get("bearerToken").(string)
-	envImpl, err := environment.NewEnvironmentImpl(bearerToken, userId)
+	envImpl, err := environment.NewEnvironmentImpl(bearerToken, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
@@ -308,7 +303,7 @@ func (handler *Handler) GetEnvironmentList(ctx echo.Context, params apigen.GetEn
 
 	var items []apigen.EnvironmentRuntimeInfo
 	for _, e := range *envInfos.Item {
-		item, err := parseEnvironmentRuntimeInfoToResponse(&e, userId)
+		item, err := parseEnvironmentRuntimeInfoToResponse(&e, userID)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 		}
@@ -323,19 +318,19 @@ func (handler *Handler) GetEnvironmentList(ctx echo.Context, params apigen.GetEn
 	return ctx.JSON(http.StatusOK, envInfosResponse)
 }
 
-func parseEnvironmentRuntimeInfoToResponse(envInfo *environment.EnvironmentReleaseInfo, userId string) (*apigen.EnvironmentRuntimeInfo, error) {
+func parseEnvironmentRuntimeInfoToResponse(envInfo *environment.EnvironmentReleaseInfo, userID string) (*apigen.EnvironmentRuntimeInfo, error) {
 	envName := apigen.EnvironmentName(*envInfo.StaticInfo.Name)
 	envState := apigen.EnvironmentState(*envInfo.State)
 	computeUnit := apigen.ComputeUnitId(*envInfo.StaticInfo.EnvironmentConfig.ComputeUnit)
 	podName := envInfo.PodName
-	image, err := URLToRepo(*envInfo.StaticInfo.EnvironmentConfig.Image.Repository, userId, *envInfo.StaticInfo.EnvironmentConfig.Image.Tag)
+	image, err := URLToRepo(*envInfo.StaticInfo.EnvironmentConfig.Image.Repository, userID, *envInfo.StaticInfo.EnvironmentConfig.Image.Tag)
 	if err != nil {
 		return nil, errors.Wrap(err, "Url to Repo error: "+utils.GetRuntimeLocation())
 	}
 	sshInfo := new(apigen.EnvironmentRuntimeSshInfo)
-	if envInfo.SshInfo != nil {
-		sshInfo.SshIp = envInfo.SshInfo.SshIp
-		sshInfo.SshPort = envInfo.SshInfo.SshPort
+	if envInfo.SSHInfo != nil {
+		sshInfo.SshIp = envInfo.SSHInfo.SSHIP
+		sshInfo.SshPort = envInfo.SSHInfo.SSHPort
 	}
 	envInfoResponse := apigen.EnvironmentRuntimeInfo{
 		SshInfo: sshInfo,
@@ -349,10 +344,10 @@ func parseEnvironmentRuntimeInfoToResponse(envInfo *environment.EnvironmentRelea
 				Image:       image,
 				Jupyter:     envInfo.StaticInfo.EnvironmentConfig.Jupyter,
 				Mounts:      envInfo.StaticInfo.EnvironmentConfig.Mounts,
-				Ssh:         envInfo.StaticInfo.EnvironmentConfig.Ssh,
+				Ssh:         envInfo.StaticInfo.EnvironmentConfig.SSH,
 			},
 			Name:        &envName,
-			NotebookUrl: envInfo.StaticInfo.NotebookUrl,
+			NotebookUrl: envInfo.StaticInfo.NotebookURL,
 		},
 		Events: envInfo.Events,
 	}

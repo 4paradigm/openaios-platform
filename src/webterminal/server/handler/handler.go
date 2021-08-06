@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package handler provides handler.
 package handler
 
 type Handler struct {

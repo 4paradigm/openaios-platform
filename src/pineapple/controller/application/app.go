@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package application provides controller for application.
 package application
 
 import (
@@ -70,7 +71,7 @@ func (a *ApplicationImpl) GetApplicationInstanceInfoList(limit int, offset int) 
 	appInstanceInfos := new(ApplicationInstanceInfos)
 	appInstanceInfos.Total = &total
 	infos := make([]ApplicationInstanceInfo, len(releases))
-	for i, _ := range releases {
+	for i := range releases {
 		info, err := parseReleaseToInstanceInfo(releases[i])
 		if err != nil {
 			return nil, errors.WithMessage(err, "parseReleaseToInstanceInfo error, i="+strconv.Itoa(i)+": ")
@@ -127,7 +128,7 @@ func (a *ApplicationImpl) GetApplicationPodsInfo(appName string) (*ApplicationPo
 		return nil, errors.WithMessage(err, "GetPodList error: ")
 	}
 	podInfos := make([]PodInfo, len(*pods))
-	for i, _ := range *pods {
+	for i := range *pods {
 		podInfos[i].Name = (*pods)[i].Name
 		podInfos[i].Status = (*pods)[i].Status.Phase
 		podInfos[i].CreateTm = (*pods)[i].CreationTimestamp.Time
@@ -238,13 +239,13 @@ func (a *ApplicationImpl) GetApplicationServicesInfo(appName string) (*Applicati
 		return nil, errors.WithMessage(err, "GetServiceList error: ")
 	}
 	svcInfos := make([]ServiceInfo, len(*svcs))
-	for i, _ := range *svcs {
+	for i := range *svcs {
 		svcInfos[i].Name = (*svcs)[i].Name
 		svcInfos[i].Type = (*svcs)[i].Spec.Type
 		svcInfos[i].ClusterIP = (*svcs)[i].Spec.ClusterIP
 		svcInfos[i].ExternalIPs = (*svcs)[i].Spec.ExternalIPs
 		ports := make([]ServicePort, len((*svcs)[i].Spec.Ports))
-		for j, _ := range (*svcs)[i].Spec.Ports {
+		for j := range (*svcs)[i].Spec.Ports {
 			ports[j].Name = (*svcs)[i].Spec.Ports[j].Name
 			ports[j].Port = strconv.Itoa(int(((*svcs)[i].Spec.Ports[j].Port)))
 			ports[j].NodePort = strconv.Itoa(int(((*svcs)[i].Spec.Ports[j].NodePort)))
@@ -263,7 +264,7 @@ func parseReleaseToInstanceInfo(r *release.Release) (*ApplicationInstanceInfo, e
 		ChartName:    r.Chart.Name(),
 		ChartVersion: r.Chart.Metadata.Version,
 		CreateTm:     r.Info.FirstDeployed.Time,
-		Duration:     time.Now().Sub(r.Info.FirstDeployed.Time),
+		Duration:     time.Since(r.Info.FirstDeployed.Time),
 		Status:       string(r.Info.Status),
 	}
 	return &info, nil
