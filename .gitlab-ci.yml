@@ -11,12 +11,12 @@ variables:
   WEBHOOK_IMAGE: '${IMAGE_REGISTRY}/webhook'
   DIND_IMAGE: "docker.4pd.io/build:11.0"
 
-static_check:
-  stage: check
-  image: golang:1.16.6-buster
-  script:
-    - make lint
-    - make vet
+#static_check:
+#  stage: check
+#  image: golang:1.16.6-buster
+#  script:
+#    - make lint
+#    - make vet
 
 build_core_image:
   stage: build_image
