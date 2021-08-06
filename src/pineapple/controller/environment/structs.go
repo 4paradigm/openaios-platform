@@ -62,6 +62,7 @@ type EnvironmentConfig struct {
 	Mounts *[]apigen.StorageMapping `json:"mounts,omitempty"`
 	SSH    *struct {
 		Enable   *bool   `json:"enable,omitempty"`
+		//lint:ignore ST1003 keep same with apigen
 		IdRsaPub *string `json:"id_rsa.pub,omitempty"`
 	} `json:"ssh,omitempty"`
 }

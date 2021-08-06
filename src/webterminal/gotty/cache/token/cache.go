@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package token provides cache for token.
 package token
 
 import (
@@ -33,7 +34,7 @@ var (
 	NoTokenProvided = errors.New("ERROR:No Token Provided")
 )
 
-//interface that defines token cache behavior
+// Cache interface that defines token cache behavior
 type Cache interface {
 	Get(token string) *TtyParameter
 	Delete(token string) error
