@@ -28,6 +28,8 @@ build_core_image:
     - docker push ${IMAGE_TAG}
   only:
     - master
+  tags:
+    - build-test
 
 build_billing_image:
   stage: build_image
@@ -39,6 +41,8 @@ build_billing_image:
     - docker push ${IMAGE_TAG}
   only:
     - master
+  tags:
+    - build-test
 
 build_webterminal_image:
   stage: build_image
@@ -50,6 +54,8 @@ build_webterminal_image:
     - docker push ${IMAGE_TAG}
   only:
     - master
+  tags:
+    - build-test
 
 build_webhook_image:
   stage: build_image
@@ -61,3 +67,5 @@ build_webhook_image:
     - docker push ${IMAGE_TAG}
   only:
     - master
+  tags:
+    - build-test
