@@ -4,8 +4,6 @@ FROM $BUILDBASE AS build
 WORKDIR /build
 COPY . .
 ARG GOPROXY=https://goproxy.cn,direct
-ARG GOMODCACHE=/go/pkg/mod
-RUN cd src && go mod download -x
 RUN make gotty web-terminal
 
 

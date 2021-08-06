@@ -9,7 +9,6 @@ variables:
   PORTAL_IMAGE: '${IMAGE_REGISTRY}/portal'
   WEBTERMINAL_IMAGE: '${IMAGE_REGISTRY}/webterminal'
   WEBHOOK_IMAGE: '${IMAGE_REGISTRY}/webhook'
-  DIND_IMAGE: "docker.4pd.io/build:11.0"
 
 #static_check:
 #  stage: check
@@ -24,12 +23,10 @@ build_core_image:
   before_script:
     - IMAGE_TAG=${CORE_IMAGE}:${CI_COMMIT_SHA}
   script:
-    - docker build -t ${IMAGE_TAG} -f ./dockerfile/webserver/Dockerfile .
+    - docker build -t ${IMAGE_TAG} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/webserver/Dockerfile .
     - docker push ${IMAGE_TAG}
   only:
     - master
-  tags:
-    - build-test
 
 build_billing_image:
   stage: build_image
@@ -37,12 +34,10 @@ build_billing_image:
   before_script:
     - IMAGE_TAG=${BILLING_IMAGE}:${CI_COMMIT_SHA}
   script:
-    - docker build -t ${IMAGE_TAG} -f ./dockerfile/billing-server/Dockerfile .
+    - docker build -t ${IMAGE_TAG} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/billing-server/Dockerfile .
     - docker push ${IMAGE_TAG}
   only:
     - master
-  tags:
-    - build-test
 
 build_webterminal_image:
   stage: build_image
@@ -50,12 +45,10 @@ build_webterminal_image:
   before_script:
     - IMAGE_TAG=${WEBTERMINAL_IMAGE}:${CI_COMMIT_SHA}
   script:
-    - docker build -t ${IMAGE_TAG} -f ./dockerfile/webterminal/Dockerfile .
+    - docker build -t ${IMAGE_TAG} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/webterminal/Dockerfile .
     - docker push ${IMAGE_TAG}
   only:
     - master
-  tags:
-    - build-test
 
 build_webhook_image:
   stage: build_image
@@ -63,9 +56,7 @@ build_webhook_image:
   before_script:
     - IMAGE_TAG=${WEBHOOK_IMAGE}:${CI_COMMIT_SHA}
   script:
-    - docker build -t ${IMAGE_TAG} -f ./dockerfile/webhook/Dockerfile .
+    - docker build -t ${IMAGE_TAG} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/webhook/Dockerfile .
     - docker push ${IMAGE_TAG}
   only:
     - master
-  tags:
-    - build-test
