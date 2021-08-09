@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"github.com/4paradigm/openaios-platform/src/internal/auth"
 	"github.com/4paradigm/openaios-platform/src/internal/response"
+	"github.com/4paradigm/openaios-platform/src/internal/version"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/apigen/internalapigen"
 	"github.com/4paradigm/openaios-platform/src/pineapple/handler"
@@ -39,6 +40,8 @@ var (
 
 func main() {
 	flag.Parse()
+	version.CheckVersionFlag()
+
 	fmt.Printf("FLAGS:\n")
 	flag.VisitAll(func(f *flag.Flag) {
 		fmt.Printf("%-25v : %v\n", f.Name, f.Value.String())

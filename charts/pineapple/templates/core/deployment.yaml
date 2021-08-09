@@ -28,8 +28,6 @@ spec:
         command:
           - "/root/pineapple"
         env:
-          - name: PINEAPPLE_VERSION
-            value: {{ .Values.version }}
           - name: PINEAPPLE_OIDC_CLIENT_ID
             value: {{ .Values.keycloak.clientID }}
           - name: PINEAPPLE_OIDC_KEYCLOAK_URL

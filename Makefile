@@ -3,7 +3,8 @@ GO111MODULE = on
 GOPROXY ?= https://goproxy.cn,direct
 CGO_ENABLED = 0
 OUTPUT_DIR ?= bin
-BUILDARGS ?= -ldflags '-s -w'
+VERSION ?= unknown
+BUILDARGS ?= -ldflags '-s -w -X github.com/4paradigm/openaios-platform/src/internal/version.version=$(VERSION)'
 
 all: pineapple billing webhook web-terminal gotty
 

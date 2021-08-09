@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 
-package handler
+package version
 
 import (
-	"github.com/4paradigm/openaios-platform/src/internal/version"
-	"github.com/labstack/echo/v4"
-	"net/http"
+    "flag"
+    "fmt"
+    "os"
 )
 
-func (handler *Handler) PineappleVersion(c echo.Context) error {
-	return c.String(http.StatusOK, version.GetVersion())
+var (
+    version string
+    printVersion = flag.Bool("version", false, "print version")
+)
+
+func GetVersion() string {
+    return version
+}
+
+func CheckVersionFlag() {
+    if *printVersion {
+        fmt.Printf("version: %v\n", GetVersion())
+        os.Exit(0)
+    }
 }
