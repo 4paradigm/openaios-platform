@@ -24,7 +24,7 @@ build_dev_image:
       --build-arg BUILDBASE=${BUILD_IMAGE}
       --build-arg KUBECTLBASE=${KUBECTL_IMAGE}
       --build-arg TARGETBASE=${TARGET_IMAGE}
-      --build-arg --build-arg VERSION=${VERSION}
+      --build-arg VERSION=${VERSION}
       --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/Dockerfile .
     - docker push ${IMAGE_TAG}
   only:
