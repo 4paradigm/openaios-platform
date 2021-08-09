@@ -56,7 +56,7 @@ lint: deps
 	$(GO) install honnef.co/go/tools/cmd/staticcheck@latest
 	cd src && staticcheck ./...
 
-vet:
+vet: deps
 	cd src && go vet ./...
 
 

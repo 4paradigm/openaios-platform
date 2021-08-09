@@ -1,20 +1,19 @@
-ARG BUILDBASE=golang:1.16.6-buster
-FROM $BUILDBASE AS build
+ARG BUILDBASE=golang:1.16.7-buster
+ARG KUBECTLBASE=bitnami/kubectl:1.20.9
+ARG TARGETBASE=ubuntu:20.04
 
+FROM $BUILDBASE AS build
 WORKDIR /build
 COPY . .
+ARG VERSION=unknown
 ARG GOPROXY=https://goproxy.cn,direct
 RUN make
 
-FROM bitnami/kubectl:1.20.9 as kubectl
-WORKDIR /usr/bin
+FROM $KUBECTLBASE as kubectl
 
-FROM alpine AS target
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories \
-    && apk update \
-    && apk add attr
+FROM $TARGETBASE AS target
 WORKDIR /
-COPY --from=kubectl /usr/bin/kubectl /usr/bin/kubectl
+COPY --from=kubectl /opt/bitnami/kubectl/bin/kubectl /usr/bin/kubectl
 COPY --from=build /build/bin/pineapple /root/pineapple
 COPY --from=build /build/bin/webhook /root/webhook
 COPY --from=build /build/bin/gotty /root/gotty

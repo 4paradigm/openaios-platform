@@ -1,25 +1,37 @@
 stages:
-  #- check
-  #- build
+  - check
   - build_image
 
 variables:
   IMAGE_NAME: '${IMAGE_REGISTRY}/openaios'
 
-#static_check:
-#  stage: check
-#  image: golang:1.16.6-buster
-#  script:
-#    - make lint
-#    - make vet
+static_check:
+  stage: check
+  image: '${BUILD_IMAGE}'
+  script:
+    - make lint
+    - make vet
 
-build_image:
+build_dev_image:
   stage: build_image
   image: '${DIND_IMAGE}'
   before_script:
     - IMAGE_TAG=${IMAGE_NAME}:${CI_COMMIT_SHA}
+    - VERSION=${CI_COMMIT_RREF_NAME}-${CI_COMMIT_SHA}
   script:
-    - docker build -t ${IMAGE_TAG} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/Dockerfile .
+    - docker build -t ${IMAGE_TAG} --build-arg VERSION=${VERSION} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/Dockerfile .
     - docker push ${IMAGE_TAG}
   only:
     - master
+
+build_release_image:
+  stage: build_image
+  image: '${DIND_IMAGE}'
+  before_script:
+    - IMAGE_TAG=${IMAGE_NAME}:${CI_COMMIT_TAG}
+    - VERSION=${CI_COMMIT_TAG}-${CI_COMMIT_SHA}
+  script:
+    - docker build -t ${IMAGE_TAG} --build-arg VERSION=${VERSION} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/Dockerfile .
+    - docker push ${IMAGE_TAG}
+  only:
+    - tags 

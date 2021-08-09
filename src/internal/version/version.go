@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// Package version provides version functions
 package version
 
 import (
@@ -31,6 +32,7 @@ func GetVersion() string {
     return version
 }
 
+// CheckVersionFlag if version flag == true, then print version info and exit
 func CheckVersionFlag() {
     if *printVersion {
         fmt.Printf("version: %v\n", GetVersion())
