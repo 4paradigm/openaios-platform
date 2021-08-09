@@ -4,11 +4,7 @@ stages:
   - build_image
 
 variables:
-  CORE_IMAGE: '${IMAGE_REGISTRY}/core'
-  BILLING_IMAGE: '${IMAGE_REGISTRY}/billing'
-  PORTAL_IMAGE: '${IMAGE_REGISTRY}/portal'
-  WEBTERMINAL_IMAGE: '${IMAGE_REGISTRY}/webterminal'
-  WEBHOOK_IMAGE: '${IMAGE_REGISTRY}/webhook'
+  IMAGE_NAME: '${IMAGE_REGISTRY}/openaios'
 
 #static_check:
 #  stage: check
@@ -17,46 +13,13 @@ variables:
 #    - make lint
 #    - make vet
 
-build_core_image:
+build_image:
   stage: build_image
   image: '${DIND_IMAGE}'
   before_script:
-    - IMAGE_TAG=${CORE_IMAGE}:${CI_COMMIT_SHA}
+    - IMAGE_TAG=${IMAGE_NAME}:${CI_COMMIT_SHA}
   script:
-    - docker build -t ${IMAGE_TAG} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/webserver/Dockerfile .
-    - docker push ${IMAGE_TAG}
-  only:
-    - master
-
-build_billing_image:
-  stage: build_image
-  image: '${DIND_IMAGE}'
-  before_script:
-    - IMAGE_TAG=${BILLING_IMAGE}:${CI_COMMIT_SHA}
-  script:
-    - docker build -t ${IMAGE_TAG} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/billing-server/Dockerfile .
-    - docker push ${IMAGE_TAG}
-  only:
-    - master
-
-build_webterminal_image:
-  stage: build_image
-  image: '${DIND_IMAGE}'
-  before_script:
-    - IMAGE_TAG=${WEBTERMINAL_IMAGE}:${CI_COMMIT_SHA}
-  script:
-    - docker build -t ${IMAGE_TAG} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/webterminal/Dockerfile .
-    - docker push ${IMAGE_TAG}
-  only:
-    - master
-
-build_webhook_image:
-  stage: build_image
-  image: '${DIND_IMAGE}'
-  before_script:
-    - IMAGE_TAG=${WEBHOOK_IMAGE}:${CI_COMMIT_SHA}
-  script:
-    - docker build -t ${IMAGE_TAG} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/webhook/Dockerfile .
+    - docker build -t ${IMAGE_TAG} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/Dockerfile .
     - docker push ${IMAGE_TAG}
   only:
     - master
