@@ -1,13 +1,12 @@
-userId: user
+userId: ""
 
 cephfs:
-  monitors:
-    - 172.27.128.151:6789
-  path: /blink-dep78
-  user: foo
+  monitors: []
+  path: ""
+  user: ""
 
 capacity:
-  storage: 10Gi
+  storage: ""
 
 cephSecret:
-  key: QVFBM2lobGZDSUJTR3hBQWcyVFZpOTJOSk5jZG5sRm1rbHpIRlE9PQ==
+  key: ""

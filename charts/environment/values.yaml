@@ -4,13 +4,13 @@ pineapple:
     resourceId: L-CPU
 
 image:
-  repository: m7-ieg-pico-test01:5000/fuhao/pineapple/env/tensorflow
-  tag: "20.12-tf2-py3"
+  repository: ""
+  tag: ""
   pullPolicy: Always
 
 serverType:
-  jupyter: "True"
-  ssh: "False"
+  jupyter: ""
+  ssh: ""
 
 ssh:
   sshKey: ""
@@ -22,15 +22,15 @@ pvc:
   claimName: "pineapple-pvc"
 
 volumeMounts:
-  - mountPath: "/workspace/sys"
-    subPath: "sys"
+  - mountPath: ""
+    subPath: ""
     name: user-storage
-  - mountPath: "/workspace/2"
-    subPath: "sys/dashboard"
+  - mountPath: ""
+    subPath: ""
     name: user-storage
 
 ingress:
-  host: "pineapple.com"
+  host: ""
   enableTLS: false
 
 appConf:
