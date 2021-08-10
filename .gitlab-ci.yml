@@ -48,12 +48,13 @@ build_release_image:
   image: '${HELM_IMAGE}'
   variables:
     RELEASE_NAME: pineapple
+    RELEASE_NAMESPACE: pineapple
     EXTRA_ARGS: ''
   script:
     - IMAGE_REPO=${IMAGE_REGISTRY}/${IMAGE_NAME}
     - >
       helm upgrade --install ${RELEASE_NAME} ./charts/pineapple
-      -n pineapple
+      -n ${RELEASE_NAMESPACE}
       -f /secrets/openaios-values.yaml
       --set core.image.repository=${IMAGE_REPO}
       --set core.image.tag=${IMAGE_TAG}

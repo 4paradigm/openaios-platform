@@ -12,6 +12,8 @@ RUN make
 FROM $KUBECTLBASE as kubectl
 
 FROM $TARGETBASE AS target
+RUN apt update
+RUN apt install -y attr
 WORKDIR /
 COPY --from=kubectl /opt/bitnami/kubectl/bin/kubectl /usr/bin/kubectl
 COPY --from=build /build/bin/pineapple /root/pineapple
