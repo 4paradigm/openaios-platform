@@ -1,6 +1,7 @@
 stages:
   - check
   - build_image
+  - deploy
 
 variables:
   IMAGE_NAME: '${IMAGE_REGISTRY}/openaios'
@@ -12,12 +13,9 @@ static_check:
     - make lint
     - make vet
 
-build_dev_image:
+.build_image:
   stage: build_image
   image: '${DIND_IMAGE}'
-  before_script:
-    - IMAGE_TAG=${IMAGE_NAME}:${CI_COMMIT_SHA}
-    - VERSION=${CI_COMMIT_RREF_NAME}-${CI_COMMIT_SHA}
   script:
     - >
       docker build -t ${IMAGE_TAG}
@@ -27,17 +25,76 @@ build_dev_image:
       --build-arg VERSION=${VERSION}
       --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/Dockerfile .
     - docker push ${IMAGE_TAG}
+
+build_dev_image:
+  extends: .build_image
+  variables:
+    IMAGE_TAG: ${IMAGE_NAME}:${CI_COMMIT_SHA}
+    VERSION: ${CI_COMMIT_RREF_NAME}-${CI_COMMIT_SHA}
   only:
     - master
 
 build_release_image:
-  stage: build_image
-  image: '${DIND_IMAGE}'
-  before_script:
-    - IMAGE_TAG=${IMAGE_NAME}:${CI_COMMIT_TAG}
-    - VERSION=${CI_COMMIT_TAG}-${CI_COMMIT_SHA}
-  script:
-    - docker build -t ${IMAGE_TAG} --build-arg VERSION=${VERSION} --build-arg GOPROXY=${GOPROXY} -f ./dockerfile/Dockerfile .
-    - docker push ${IMAGE_TAG}
+  extends: .build_image
+  variables:
+    IMAGE_TAG: ${IMAGE_NAME}:${CI_COMMIT_TAG}
+    VERSION: ${CI_COMMIT_TAG}-${CI_COMMIT_SHA}
   only:
     - tags 
+
+.deploy:
+  stage: deploy
+  image: '${HELM_IMAGE}'
+  variables:
+    RELEASE_NAME: pineapple
+    EXTRA_ARGS: ''
+  script:
+    - >
+      helm upgrade --install ${RELEASE_NAME} ./charts/pineapple
+      -n pineapple
+      -f /secrets/openaios-values.yaml
+      --set core.image.repository=${IMAGE_NAME}
+      --set core.image.tag=${IMAGE_TAG}
+      --set webterminal.image.repository=${IMAGE_NAME}
+      --set webterminal.image.tag=${IMAGE_TAG}
+      --set billing.image.repository=${IMAGE_NAME}
+      --set billing.image.tag=${IMAGE_TAG}
+      --set webhook.image.repository=${IMAGE_NAME}
+      --set webhook.image.tag=${IMAGE_TAG}
+      ${EXTRA_ARGS}
+
+deploy_develop:
+  extends: .deploy
+  variables:
+    IMAGE_TAG: ${CI_COMMIT_SHA}
+  environment:
+    name: pineapple-develop
+  only:
+    - master
+  tags:
+    - deploy-test
+
+deploy_pre_product:
+  extends: .deploy
+  variables:
+    IMAGE_TAG: ${CI_COMMIT_TAG}
+    EXTRA_ARGS: "--wait --timeout=30m"
+  environment:
+    name: pineapple-develop
+  only:
+    - tags
+  tags:
+    - deploy-test
+
+deploy_product:
+  extends: .deploy
+  variables:
+    IMAGE_TAG: ${CI_COMMIT_TAG}
+  environment:
+    name: pineapple-product
+  only:
+    - tags
+  tags:
+    - deploy-product
+  when: manual
+

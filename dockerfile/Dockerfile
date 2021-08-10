@@ -20,5 +20,6 @@ COPY --from=build /build/bin/gotty /root/gotty
 COPY --from=build /build/bin/web-terminal /root/web-terminal
 COPY --from=build /build/bin/billing /root/billing
 COPY ./charts /root/charts
+COPY ./LICENSE /root/LICENSE
 WORKDIR /root
 ENV PINEAPPLE_ENV_CHARTSDIR /root/charts

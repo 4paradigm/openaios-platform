@@ -1,7 +1,6 @@
-
 core:
   image:
-    repository: docker.4pd.io/adc/pineapple/core
+    repository: 4pdosc/openaios
     tag: latest
     pullPolicy: IfNotPresent
 
@@ -30,9 +29,9 @@ core:
 webterminal:
   replicaCount: 1
   image:
-    repository: docker.4pd.io/adc/pineapple/webterminal
-    tag: 21.4.1
-    pullPolicy: Always
+    repository: 4pdosc/openaios
+    tag: latest
+    pullPolicy: IfNotPresent 
   resources:
     server:
       limits:
@@ -49,30 +48,12 @@ webterminal:
         cpu: 2
         memory: 4Gi
 
-portal:
-  replicaCount: 1
-
-  image:
-    repository: docker.4pd.io/adc/pineapple/portal
-    tag: latest
-    pullPolicy: IfNotPresent
-
-  resources:
-    limits:
-      cpu: 2
-      memory: 4Gi
-    requests:
-      cpu: 2
-      memory: 4Gi
-
 billing:
   replicaCount: 1
-
   image:
-    repository: docker.4pd.io/adc/pineapple/billing
-    tag: 0.1.1
+    repository: 4pdosc/openaios 
+    tag: latest
     pullPolicy: IfNotPresent
-
   resources:
     limits:
       cpu: 2
@@ -80,7 +61,6 @@ billing:
     requests:
       cpu: 2
       memory: 4Gi
-
   mongodb:
     dbName: mydb
     url: mongodb://localhost:27017
@@ -90,9 +70,9 @@ billing:
 
 webhook:
   image:
-    repository: docker.4pd.io/adc/pineapple/webhook
+    repository: 4pdosc/openaios 
     tag: latest
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
   resources:
     limits:
       cpu: 1
@@ -106,11 +86,11 @@ webhook:
   # webhook所使用证书，由于是集群内部认证，推荐使用自签证书或者如下证书
   tls:
     # required
-    cert:
+    cert: fakeCert
     # required
-    key:
+    key: fakeKey
     # required
-    ca:
+    ca: fakeCA
 
 # 集群大部分服务签发所用的根证书，主要是方便内部绕到外部访问keycloak等服务的https端口
 # 目前主要是core模块以及webterminal模块使用
@@ -144,7 +124,7 @@ userCeph:
 webserverCeph:
   cephfs:
     monitors:
-      - 172.24.15.114
+      - localhost
     path: /inf
     user: pineappleAdmin
   cephSecret:
