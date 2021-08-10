@@ -208,7 +208,7 @@ func MkUserDir(userID string) error {
 	if quotaBytes != "" {
 		cmd := exec.Command("setfattr", "-n", "ceph.quota.max_bytes", "-v", quotaBytes, userDir)
 		if err := cmd.Run(); err != nil {
-			return errors.New("cannot set quota for user " + utils.GetRuntimeLocation())
+			return errors.Wrap(err, "cannot set quota for user " + utils.GetRuntimeLocation())
 		}
 	}
 	return nil
