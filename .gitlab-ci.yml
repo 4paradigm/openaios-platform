@@ -4,7 +4,7 @@ stages:
   - deploy
 
 variables:
-  IMAGE_NAME: '${IMAGE_REGISTRY}/openaios'
+  IMAGE_NAME: ${IMAGE_REGISTRY}/openaios
 
 static_check:
   stage: check
@@ -17,6 +17,7 @@ static_check:
   stage: build_image
   image: '${DIND_IMAGE}'
   script:
+    - env
     - >
       docker build -t ${IMAGE_TAG}
       --build-arg BUILDBASE=${BUILD_IMAGE}

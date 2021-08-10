@@ -86,11 +86,11 @@ webhook:
   # webhook所使用证书，由于是集群内部认证，推荐使用自签证书或者如下证书
   tls:
     # required
-    cert: fakeCert
+    cert: ''
     # required
-    key: fakeKey
+    key: ''
     # required
-    ca: fakeCA
+    ca: ''
 
 # 集群大部分服务签发所用的根证书，主要是方便内部绕到外部访问keycloak等服务的https端口
 # 目前主要是core模块以及webterminal模块使用
