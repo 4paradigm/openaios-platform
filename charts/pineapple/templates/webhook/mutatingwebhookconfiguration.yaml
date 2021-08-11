@@ -9,6 +9,9 @@ webhooks:
         name: {{ include "pineapple.webhook.fullname" . }}
         namespace: {{ .Release.Namespace }}
         path: "/mutate"
+    namespaceSelector:
+      matchLabels:
+        user_ready: "true"
     objectSelector:
       matchExpressions:
       - key: 4pd.io/openaios-webhook
