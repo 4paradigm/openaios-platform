@@ -1,3 +1,8 @@
+imagePullPolicy: []
+
+podSecurityPolicy:
+  enabled: false
+
 core:
   image:
     repository: 4pdosc/openaios
@@ -22,8 +27,9 @@ core:
     PINEAPPLE_PVC_CHARTSDIR: /root/charts/cephfs-pvc
     PINEAPPLE_PVC_CEPH_JSON_DIR: /root/config/cephfs-info.yaml
 
-    # mongodb
+    # mongodb connection string
     PINEAPPLE_MONGODB_URL: mongodb://localhost:27017
+    # mongodb database name
     PINEAPPLE_MONGODB_DATABASE: myapp
 
 webterminal:
@@ -73,7 +79,8 @@ webhook:
     repository: 4pdosc/openaios 
     tag: latest
     pullPolicy: IfNotPresent
-  resources:
+
+    resources:
     limits:
       cpu: 1
       memory: 2Gi
@@ -83,14 +90,22 @@ webhook:
   port:
     containerPort: 8443
     servicePort: 443
-  # webhook所使用证书，由于是集群内部认证，推荐使用自签证书或者如下证书
+  # webhook所使用证书，也可以使用下面的patch自动生成证书
   tls:
-    # required
     cert: ''
-    # required
     key: ''
-    # required
     ca: ''
+  # If enabled, generate a self-signed certificate, then patch the webhook configurations with the generated data.
+  patch:
+    enabled: true
+    image: docker.io/jettech/kube-webhook-certgen:v1.5.2
+    imagePullPolicy: IfNotPresent
+    priorityClassName: ""
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    runAsUser: 2000
+
 
 # 集群大部分服务签发所用的根证书，主要是方便内部绕到外部访问keycloak等服务的https端口
 # 目前主要是core模块以及webterminal模块使用
@@ -98,9 +113,9 @@ rootCA: "pineapple-ca"
 
 keycloak:
   # required
-  clientID:
+  clientID: ''
   # required
-  url:
+  url: ''
 
 harbor:
   url: https://harbor.pineapple.com:32443

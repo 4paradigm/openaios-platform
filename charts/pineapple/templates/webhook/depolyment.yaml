@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
         {{- include "pineapple.webhook.labels" . | nindent 8 }}
+        4pd.io/openaios-webhook: ignore
     spec:
       containers:
         - name: webhook
@@ -35,4 +36,4 @@ spec:
       volumes:
         - name: webhook-tls-certs
           secret:
-            secretName: pineapple-webhook-tls
+            secretName: {{ include "pineapple.webhook.fullname" . }}-tls

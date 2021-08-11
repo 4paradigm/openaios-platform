@@ -9,7 +9,12 @@ webhooks:
         name: {{ include "pineapple.webhook.fullname" . }}
         namespace: {{ .Release.Namespace }}
         path: "/mutate"
-      caBundle: {{ .Values.webhook.tls.ca }}
+    objectSelector:
+      matchExpressions:
+      - key: 4pd.io/openaios-webhook
+        operator: NotIn
+        values:
+        - ignore
     rules:
       - operations: [ "CREATE" ]
         apiGroups: [""]

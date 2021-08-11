@@ -1,0 +1,53 @@
+{{- if .Values.webhook.patch.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "pineapple.webhook.fullname" . }}-admission-patch
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+  labels:
+    {{- include "pineapple.webhook.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admission-webhook
+spec:
+  {{- if .Capabilities.APIVersions.Has "batch/v1alpha1" }}
+  # Alpha feature since k8s 1.12
+  ttlSecondsAfterFinished: 0
+  {{- end }}
+  template:
+    metadata:
+      name: {{ include "pineapple.webhook.fullname" . }}-admission-patch
+      {{- if .Values.webhook.patch.podAnnotations }}
+      annotations: {{ toYaml .Values.webhook.patch.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "pineapple.webhook.labels" . | nindent 8 }}
+        app.kubernetes.io/component: admission-webhook
+        4pd.io/openaios-webhook: ignore
+    spec:
+      {{- if .Values.webhook.patch.priorityClassName }}
+      priorityClassName: {{ .Values.webhook.patch.priorityClassName }}
+      {{- end }}
+      containers:
+        - name: patch
+          image: {{ .Values.webhook.patch.image }}
+          imagePullPolicy: {{ .Values.webhook.patch.imagePullPolicy }}
+          args:
+            - patch
+            - --webhook-name={{ include "pineapple.webhook.fullname" . }}
+            - --namespace={{ .Release.Namespace }}
+            - --patch-validating=false
+            - --secret-name={{ include "pineapple.webhook.fullname" . }}-tls
+            - --patch-failure-policy=Fail
+      restartPolicy: OnFailure
+      serviceAccountName: {{ include "pineapple.webhook.fullname" . }}-admission
+      {{- if .Values.webhook.patch.nodeSelector }}
+      nodeSelector: {{ toYaml .Values.webhook.patch.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.webhook.patch.tolerations }}
+      tolerations: {{ toYaml .Values.webhook.patch.tolerations | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: {{ .Values.webhook.patch.runAsUser }}
+{{- end }}
