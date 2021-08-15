@@ -8,7 +8,6 @@
 - GetOneComputeUnit：获取一个算力规格的具体内容
 - GetComputeUnitListByUserID：获取一个用户可以使用的所有算力规格
 - GetComputeUnitListByGroupName：获取指定group下所有的算力规格
-- CreateInstance：已经废弃不再使用
 - GetComputeUnitPrice：获取指定算力规格的价格 
 - AddComputeunitGroupToUser：给用户添加算力规格的group
 
