@@ -4,6 +4,25 @@ OpenAIOS Platform是一款基于OpenAIOS搭建起来的开发应用平台，Open
 
 社区团队目前在进行积极的使用反馈收集和文档的迭代，在使用过程，遇到任何问题或疑问，都可以通过发送邮件到 opensource@4paradigm.com 来获取帮助。
 
+## 部署
+
+### 依赖
+
+- Kubernetes >= 1.16
+- NGINX Ingress Controller
+- Harbor
+- Keycloak
+- CephFS
+- Mongodb
+
+### 安装
+
+通过helm安装，配置好charts/pineapple/values.yaml，然后执行
+
+```
+helm install ${RELEASE_NAME} charts/pineapple -n ${RELEASE_NAMESPACE}
+```
+
 ## 基础概念解释
 ### 开发环境
 开发环境是一个单pod容器，通过JupyterLab、SSH和WebTerminal与环境进行交互， JupyterLab和WebTerminal可以让我们基于网页与环境交互，SSH可以与本地IDE打通，例如vscode、pycharm等。
