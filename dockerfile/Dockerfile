@@ -13,7 +13,7 @@ FROM $KUBECTLBASE as kubectl
 
 FROM $TARGETBASE AS target
 RUN apt update
-RUN apt install -y attr
+RUN apt install -y attr ca-certificates
 WORKDIR /
 COPY --from=kubectl /opt/bitnami/kubectl/bin/kubectl /usr/bin/kubectl
 COPY --from=build /build/bin/pineapple /root/pineapple
