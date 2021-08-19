@@ -50,7 +50,7 @@ func InitAuth() error {
 
 	provider, err := oidc.NewProvider(context.TODO(), *keycloakURL)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to new provider")
 	}
 
 	oidcConfig := &oidc.Config{
