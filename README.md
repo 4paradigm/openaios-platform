@@ -1,4 +1,9 @@
 # OpenAIOS-Platform
+
+
+[![build status](https://github.com/4paradigm/openaios-platform/actions/workflows/build.yml/badge.svg)](https://github.com/4paradigm/openaios-platform/actions/workflows/build.yml)
+[![docker pulls](https://img.shields.io/docker/pulls/4pdosc/openaios.svg)](https://hub.docker.com/r/4pdosc/openaios)
+
 ## 简介
 OpenAIOS Platform是一款基于OpenAIOS搭建起来的开发应用平台，OpenAIOS也依托于此对外输出核心能力，平台目前作为公有服务对外开放，网站地址是 https://openaios.4paradigm.com 。平台基于OpenAIOS搭建了一个统一的基础设施抽象层——算力规格，让应用开发者更少的关注基础设施；并且平台还提供AI的基础组件，让开发者在享受云原生带来的便利的同时，更加快速的开发、使用AI应用。
 
